@@ -1,9 +1,14 @@
 .support.info
+App_Debug.xml
+App_Options.xml
 CommaNum.xml
 Debug.xml
+Doc_Self.xml
 Fill.xml
 Options.xml
 ParseCxx.xml
 Self.xml
 SupportTools.xml
 Teamnet.xml
+Text_CommaNum.xml
+Text_Fill.xml
