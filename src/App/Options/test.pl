@@ -51,61 +51,18 @@ print "ok 1\n";
 # of the test code):
 
 our @Options =
-  (
-   [ "help+",		undef,
-			"",	    "opt",
-			"Output usage information.",
-			"The amount of information increases each"
-			." time it appears on the command line."
-			." The first instance just outputs the available"
-			." command line arguments. Successive instances"
-			." (i.e. -help -help -help) provide additional"
-			." information up to 4 which output the entire"
-			." program documentation." ],
-
-   [ "man",		undef,
-			"",	    "opt",
-			"Output the entire program documentation.",
-			"This is just a short cut for using -help 4 times" ],
-
-   [ "nopager",		undef,
-			"",	    "opt",
-			"Don NOT use pager for help output",
-			"When ever the help (or man) text has more lines"
-			." that your terminal window, the default pager"
-			." is used to keep the text from scrolling off"
-			." the screen. To keep the pager from being used,"
-			." put this option on the command line." ],
-
-   [ "show-opts",	undef,
-			"",	    "opt",
-			"Show option and env values then exit.",
-			"Output the command line options and their respective"
-			." current values. Also output any relevant"
-			." environment variables and their respective"
-			." values." ],
-
-   [ "debug+",		undef,
-			"",	    "opt",
-			"Output debug information.",
-			"Increments the amount of debug information"
-			." each time it is found in the arguments. So,"
-			." no --debug sets debug level to 0 (none),"
-			." one -debug sets it to 1 and -debug -debug"
-			." sets the debug level to 2. The higher the"
-			." level, the more debug information is"
-			." output." ],
-   [ "version",		undef,
-			"",	    "opt",
-			"Show version and exit.",
-			"Output the program's version information"
-			." then exit" ]
+  ( @App::Options::StdOpts,
+    [ "test-opt=s",	undef,
+			"STRING",	    "opt",
+			"test option",
+			"just for testing" ]
    );
 
 $App::Options::debug = 1;
 my $opts  = new App::Options( OPTIONS => \@Options );
 
-
+# $opts->{ 'option' }->{ 'arg-file' } = "test.args";
+$opts->gen_arg_file();
 
 #
 # Revision Log:
