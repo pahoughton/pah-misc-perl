@@ -18,6 +18,9 @@
 # $Id$
 #
 # $Log$
+# Revision 1.4  1997/05/12 10:58:14  houghton
+# Added Dist development.
+#
 # Revision 1.3  1997/02/24 15:27:01  houghton
 # Added aniserver.
 # Changed to open ~/pers/work/status/log.
@@ -44,22 +47,23 @@ $LogFile = "$ENV{HOME}/pers/work/status/log";
 	      "TOOLS",		"06",
 	      "RATING",		"07",
 	      "CISDESIGN",	"08",
-	      "DISTRIB",	"09",
-	      "SICK",		"10",
-	      "ST_DIS",		"11",
-	      "VAC",		"12",
-	      "HOLY",		"13",
-	      "FLOAT",		"14",
-	      "FAM_ILL",	"15",
-	      "BEREAV",		"16",
-	      "INJURY",		"17",
-	      "MIL_LEV",	"18",
-	      "JURY",		"19",
-	      "NP_OVER",	"20",
-	      "INT_MEET",	"21",
-	      "TRAIN",		"22",
-	      "COMP",		"23",
-	      "OTHER",		"24"
+	      "DISTRIB_DB",	"09",
+	      "DIST",		"10"
+	      "SICK",		"11",
+	      "ST_DIS",		"12",
+	      "VAC",		"13",
+	      "HOLY",		"14",
+	      "FLOAT",		"15",
+	      "FAM_ILL",	"16",
+	      "BEREAV",		"17",
+	      "INJURY",		"18",
+	      "MIL_LEV",	"19",
+	      "JURY",		"20",
+	      "NP_OVER",	"21",
+	      "INT_MEET",	"22",
+	      "TRAIN",		"23",
+	      "COMP",		"24",
+	      "OTHER",		"25"
 	     );
 
 $doubeLine = 07;
@@ -72,8 +76,9 @@ $doubeLine = 07;
 	     "CORE",	"T98033-011\nCentral Repos/TQM",
 	     "TOOLS",	"T98033-013\nTools",
 	     "RATING",	"T98033-015\nRating",
-	     "CISDESIGN", "T04071-070\nPH I-Dev",
-	     "DISTRIB",	"T04071-050\nDBSS Interface",
+	     "CISDESIGN",   "T04071-070\nPH I-Dev",
+	     "DISTRIB_DB",  "T04071-050\nDBSS Interface",
+	     "DIST",	    "T04071-060\nDistributor Development"
 	     "SICK",	"Sick",
 	     "ST_DIS",	"Short Trm Dis",
 	     "VAC",	"Vacation",
