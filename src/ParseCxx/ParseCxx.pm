@@ -1,38 +1,33 @@
+#
+# File:	    ParseCxx.pm
+# Project:  PerlUtils %PP%
+# Item:	    %PI% (%PF%)
+# Desc:
+#
+#   Source for ParseCxx perl module.
+#
+# Notes:
+#
+#   See pod below for documentation
+#
+# Created:  5/30/01 13:28
+# Author:   Paul Houghton <paul.houghton@wcom.com>
+#
+# Revision Information
+#
+#   Last Mod By:    %PO%
+#   Last Mod:	    %PRT%
+#   Version:	    %PIV%
+#   Status:	    %PS%
+#
+# %PID%
+#
 package ParseCxx;
 
-require 5.005_62;
+require 5.006;
 use strict;
 use warnings;
 
-our %Doc;
-$Doc{ File }	=   "ParseCxx.pm";
-$Doc{ Project } =   ["PerlUtils","%PP%"];
-$Doc{ Item }   	=   "%PI% (%PF%)";
-$Doc{ desc } = "C++ header file parser";
-
-$Doc{ Description } = "
-
-
-";
-$Doc{ Notes } = "
-
-";
-$Doc{ Author } =  [["Paul Houghton","<paul.houghton\@wcom.com>"]];
-$Doc{ Created } = "05/30/01 13:28";
-
-$Doc{ Last_Mod_By } = "%PO%";
-$Doc{ Last_Mod }    = "%PRT%";
-$Doc{ Ver }	    = "%PIV%";
-$Doc{ Status }	    = "%PS%";
-
-$Doc{ VersionId }
-  = "%PID%";
-
-$Doc{ VERSION } = "+VERSION+";
-
-#
-# Revision History: (See end of file for Revision Log)
-#
 
 require Exporter;
 use AutoLoader qw(AUTOLOAD);
@@ -80,18 +75,14 @@ __END__
 
 =head1 NAME
 
-ParseCxx - Perl extension for blah blah blah
+ParseCxx - C++ Header Parser
 
 =head1 SYNOPSIS
 
   use ParseCxx;
-  blah blah blah
 
 =head1 DESCRIPTION
 
-Stub documentation for ParseCxx, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
 
 Blah blah blah.
 
@@ -102,7 +93,7 @@ None by default.
 
 =head1 AUTHOR
 
-A. U. Thor, a.u.thor@a.galaxy.far.far.away
+Paul Houghton <paul.houghton@wcom.com>
 
 =head1 SEE ALSO
 
@@ -113,6 +104,7 @@ perl(1).
 use Text::Tabs;
 use File::Basename;
 use App::Debug;
+use Carp;
 
 sub ParseHeaderInfo ($$) {
   my $in    = shift(@_);
@@ -236,12 +228,12 @@ sub ParseOpenBrace ($$$) {
     }
 
     ++ $$info{ typeNum };
-    $$info{ type }->{ $$info{ typeNum } } = { type => "$type",
+    $$info{ "type" }->{ $$info{ typeNum } } = { "type" => "$type",
 					      name => "$name"
 					    };
 
-    $$info{ type }->{ $$info{ typeNum } }->{ $type }->{ name } = $name;
-    $$info{ type }->{ $$info{ typeNum } }->{ $type }->{ $name } =
+    $$info{ "type" }->{ $$info{ typeNum } }->{ $type }->{ name } = $name;
+    $$info{ "type" }->{ $$info{ typeNum } }->{ $type }->{ $name } =
       {
        template		=> "",
        name		=> $name,
@@ -268,14 +260,14 @@ sub ParseOpenBrace ($$$) {
       $prot = "public";
     }
 
-    $down = $$info{ type }->{ $$info{ typeNum } }->{ $type }->{ $name };
-    $$info{ type }->{ $$info{ typeNum } }->{ $type }->{ $name }->{ $prot }
+    $down = $$info{ "type" }->{ $$info{ typeNum } }->{ $type }->{ $name };
+    $$info{ "type" }->{ $$info{ typeNum } }->{ $type }->{ $name }->{ $prot }
       = {
 	 prot => $prot,
 	 down => $down
 	};
 
-    $$info{ type }->{ $$info{ typeNum } }->{ $type }->{ $name }->{ down }
+    $$info{ "type" }->{ $$info{ typeNum } }->{ $type }->{ $name }->{ down }
       = $info;
 
     Debug( 5, "$info\n" );
@@ -283,7 +275,7 @@ sub ParseOpenBrace ($$$) {
     Debug( 5, "$$info{ type }->{ $$info{ typeNum } }->{ $type }->{ $name }->{ $prot }\n" );
     Debug( 5, "$$info{ type }->{ $$info{ typeNum } }->{ $type }->{ $name }->{ $prot }->{ down }\n" );
 
-    return( $$info{ type }->{ $$info{ typeNum } }->{ $type }->{ $name }->{ $prot } );
+    return( $$info{ "type" }->{ $$info{ typeNum } }->{ $type }->{ $name }->{ $prot } );
   } elsif ( $statement =~ /(.*)\s*(enum)\s+(.*)/ ) {
     my $prefix = $1;
     my $name = $3;
@@ -292,18 +284,18 @@ sub ParseOpenBrace ($$$) {
     $type = "enum";
 
     ++ $$info{ typeNum };
-    $$info{ type }->{ $$info{ typeNum } } = { type => $type,
+    $$info{ "type" }->{ $$info{ typeNum } } = { "type" => $type,
 					      name => $name
 					    };
-    $$info{ type }->{ $$info{ typeNum } }->{ $type }->{ name } = $name;
-    $$info{ type }->{ $$info{ typeNum } }->{ $type }->{ $name } =
+    $$info{ "type" }->{ $$info{ typeNum } }->{ $type }->{ name } = $name;
+    $$info{ "type" }->{ $$info{ typeNum } }->{ $type }->{ $name } =
       {
        name		=> $name,
        type		=> $type,
        down		=> $info,
        enumNum		=> 0
       };
-    return( $$info{ type }->{ $$info{ typeNum } }->{ $type }->{ $name } );
+    return( $$info{ "type" }->{ $$info{ typeNum } }->{ $type }->{ $name } );
   } else {
     $info = ParseStatement( $statement, $info, $context );
     $$context = "funcbody";
@@ -378,7 +370,8 @@ sub ParseStatement ($$$) {
       if( defined( $$topInfo{ MainClass } ) ) {
 	StoreFunc( $return, $funcName, $sig, $rest, $topInfo );
       } else {
-	die "could not find Top Level info.";
+	DebugDumpHash( 3, "TOP", $topInfo, "down" );
+	confess "could not find Top Level info.";
       }
     } else {
       StoreFunc( $return, $funcName, $sig, $rest, $info );
@@ -390,11 +383,11 @@ sub ParseStatement ($$$) {
       my $type = $2;
 
       ++ $$info{ typeNum };
-      $$info{ type }->{ $$info{ typeNum } } = { type => "typedef",
+      $$info{ "type" }->{ $$info{ typeNum } } = { "type" => "typedef",
 						name => "$type"
 					      };
 
-      $$info{ type }->{ $$info{ typeNum } }->{ typedef }->{ "$type" } =
+      $$info{ "type" }->{ $$info{ typeNum } }->{ typedef }->{ "$type" } =
 	{
 	 name	    => $type,
 	 src	    => $src
@@ -490,7 +483,7 @@ sub ParseCloseBrace ($$$) {
     Debug( 5, "$info\n" );
     Debug( 5, "$$info{ down }->{ down }\n" );
     return( $$info{ down }->{ down } );
-  } elsif ( $$info{ type } eq "enum" ) {
+  } elsif ( $$info{ "type" } eq "enum" ) {
     Debug( 4, "ENUM: $statement\n");
     my $e;
     foreach $e (split(/,/,$statement)) {
@@ -590,29 +583,29 @@ sub StoreFunc ($$$$$) {
     my @argList;
     foreach $a (split( /,/, $sig )) {
       if( $a =~ /void/ ) {
-	push( @argList,{ type => "void",
+	push( @argList,{ "type" => "void",
 			 name => "",
 			 default => ""
 		       } );
       } elsif( $a =~ /\s*(.*)\s+(\w+)\s*=\s*(.*)\s*$/ ) {
-	push( @argList,{ type => "$1",
+	push( @argList,{ "type" => "$1",
 			 name => "$2",
 			 default => "$3"
 		       } );	
       } elsif( $a =~ /\s*(.*)\s+(\w+)\s*$/ ) {
-	push( @argList, { type => $1,
+	push( @argList, { "type" => $1,
 			  name => $2,
 			  default => ""
 			} );
       } else {
-	push( @argList, { type => $a,
+	push( @argList, { "type" => $a,
 			  name => "",
 			  default => ""
 			} );
       }
     }
     $$info{ func }->{ $$info{ funcNum } }->{ arglist } = \@argList;
-    
+
     # Debug( 0, "@argList );
   }
 	
@@ -622,37 +615,38 @@ sub StoreFunc ($$$$$) {
 sub FindInnerClass {
   my ( $info, $inClasses ) = (@_);
 
-  my $type = $$info{ type
+  my $type = $$info{ "type"
 		   }->{ $$info{ MainClass }->{ number }
-		      }->{ $$info{ MainClass }->{ type }
+		      }->{ $$info{ MainClass }->{ "type" }
 			 }->{ $$info{ MainClass }->{ name } };
 
   my $sc;
   my $foundSubclass = 0;
+  my $subType = $type;
+  Debug( 3, "Looking for inner class '$inClasses'" );
   foreach $sc (split(/::/,$inClasses)) {
     my $t;
-    my $subType;
-    $subType = undef;
-    foreach $t (keys(%{$$type{ public }->{ type }})) {
-      if( $sc eq $$type{ public }->{ type }->{ $t }->{ name } ) {
-	$subType = $$type{ public
-			 }->{ type
-			    }->{ $t
-			      }->{ $$type{ public
-					 }->{ type
-					    }->{ $t
-					      }->{ type }
-				 }->{ $sc };
+    foreach $t (keys(%{$$subType{ "public" }->{ "type" }})) {
+      if( $sc eq $$subType{ "public" }->{ "type" }->{ $t }->{ name } ) {
+	$subType = $$subType{ "public"
+			    }->{ "type"
+			       }->{ $t
+				  }->{ $$type{ "public"
+					     }->{ "type"
+						}->{ $t
+						   }->{ "type" }
+				     }->{ $sc };
+	Debug( 3, "Found inner class '$subType'" );
+	DebugDumpHash( 3, "FND INR", $subType, "down" );
 	last;
       }
     }
-    if( defined( $subType ) ) {
-      $type = $subType;
-    } else {
-      die "ERROR: inner type '$inClasses' not found."
-    }
   }
-  return( $type );
+  if( $subType == $type ) {
+    confess "ERROR: inner type '$inClasses' not found."
+  }
+  Debug( 3, "Found inner class '$subType'" );
+  return( $subType );
 }
 
 
@@ -670,15 +664,15 @@ sub SetTypeDesc {
     $typeList
       = $$info{ "type"
 	      }->{ $$info{ MainClass }->{ number }
-		 }->{ $$info{ MainClass }->{ type }
+		 }->{ $$info{ MainClass }->{ "type" }
 		    }->{ $$info{ MainClass }->{ name }
-		       }->{ $prot }->{ type };
+		       }->{ $prot }->{ "type" };
   } else {
     if( $name =~ /^(.*)::(\w+)$/ ) {
       my $inClasses = $1;
       $name = $2;
       my $type = FindInnerClass( $info, $inClasses );
-      $typeList = $type{ $prot }->{ type };
+      $typeList = $type{ $prot }->{ "type" };
     } else {
       die "IMPOSIBLE ! ::";
     }
@@ -748,7 +742,7 @@ sub SetTypeDesc {
   }
   if( ! $found ) {
     DebugDumpHash( 0, "TYPE", $typeList, "down" );
-    die "Type '$prot' '$type' '$name' NOT found.";
+    confess "Type '$prot' '$type' '$name' NOT found.";
   }
 }
 
@@ -886,7 +880,7 @@ sub SetFuncDesc ($$$$) {
       $funcList
 	= $$info{ "type"
 		}->{ $$info{ MainClass }->{ number }
-		   }->{ $$info{ MainClass }->{ type }
+		   }->{ $$info{ MainClass }->{ "type" }
 		      }->{ $$info{ MainClass }->{ name }
 			 }->{ $prot }->{ func }; 
       Debug( 3, "MAIN CLASS FUNCLIST '$funcList'\n",
@@ -898,8 +892,10 @@ sub SetFuncDesc ($$$$) {
   } else {
     Debug( 3, "SUBCLASS FUNCLIST\n" );
     if( $funcName =~ /(.*)::(\w+|operator[^:]+)$/ ) {
-      my $inClasses;
+      my $inClasses = $1;
+      $funcName = $2;
       my $type = FindInnerClass( $info, $inClasses );
+      DebugDumpHash( 2, "SUBTYPE:", $type, "down" );
       $funcList = $$type{ $prot }->{ func };
     } else {
       die "IMPOSIBLE ! ::";
@@ -923,12 +919,12 @@ sub SetFuncDesc ($$$$) {
       }
     }
   }
-  
+
 
   DebugDumpHash(  2, "FUNCS", $funcList , "down" );
   if( ! $foundFunc ) {
-    DebugDumpHash(  1, "FUNCS", $funcList , "down" );
-    die "ERROR: $$info{ filename } function '$funcName( $sig ) $funcConst' not found.";
+    DebugDumpHash(  0, "FUNCS", $funcList , "down" );
+    confess "ERROR: $$info{ filename } function '$funcName( $sig ) $funcConst' not found.";
   }
 }
 
