@@ -62,7 +62,67 @@ our $VERSION = '1.01';
 
 our( $debug );
 
+our @StdOpts =
+  (
+   [ "arg-file=s",	undef,
+			"FILE",	    "opt",
+			"command line arguments file.",
+			"Name of the file to read command line"
+			." arguments from."],
+   [ "gen-arg-file",	undef,
+			"",	    "opt",
+			"generate the args file.",
+			"Create the args file from the current option"
+			." settings"],
+   [ "help+",		undef,
+			"",	    "opt",
+			"Output usage information.",
+			"The amount of information increases each"
+			." time it appears on the command line."
+			." The first instance just outputs the available"
+			." command line arguments. Successive instances"
+			." (i.e. -help -help -help) provide additional"
+			." information up to 4 which output the entire"
+			." program documentation." ],
 
+   [ "man",		undef,
+			"",	    "opt",
+			"Output the entire program documentation.",
+			"This is just a short cut for using -help 4 times" ],
+
+   [ "nopager",		undef,
+			"",	    "opt",
+			"Don NOT use pager for help output",
+			"When ever the help (or man) text has more lines"
+			." that your terminal window, the default pager"
+			." is used to keep the text from scrolling off"
+			." the screen. To keep the pager from being used,"
+			." put this option on the command line." ],
+
+   [ "show-opts",	undef,
+			"",	    "opt",
+			"Show option and env values then exit.",
+			"Output the command line options and their respective"
+			." current values. Also output any relevant"
+			." environment variables and their respective"
+			." values." ],
+
+   [ "debug+",		undef,
+			"",	    "opt",
+			"Output debug information.",
+			"Increments the amount of debug information"
+			." each time it is found in the arguments. So,"
+			." no --debug sets debug level to 0 (none),"
+			." one -debug sets it to 1 and -debug -debug"
+			." sets the debug level to 2. The higher the"
+			." level, the more debug information is"
+			." output." ],
+   [ "version",		undef,
+			"",	    "opt",
+			"Show version and exit.",
+			"Output the program's version information"
+			." then exit" ],
+  );
 # Preloaded methods go here.
 sub new ($%);
 sub opt ($$);
@@ -106,6 +166,7 @@ perl(1).
 
 use App::Debug;
 use Getopt::Long;
+use IO::File;
 use Carp;
 
 sub new ($%) {
@@ -266,6 +327,21 @@ sub new ($%) {
     }
   }
 
+  {
+    # if there is an arg file, use it
+    for( my $i = 0; $i < scalar( @ARGV ); ++ $i ) {
+      if( $ARGV[$i] =~ /-arg-file/ ) {
+	if( $ARGV[$i] =~ /-arg-file=(.*)/ ) {
+	  $$self{ option }->{ 'arg-file' } = $1;
+	} else {
+	  $$self{ option }->{ 'arg-file' } = $ARGV[ $i + 1 ];
+	}
+	$self->parse_arg_file();
+	last;
+      }
+    }
+  }
+
   if( $debug ) {
     Getopt::Long::Configure( "debug" );
   }
@@ -308,6 +384,10 @@ sub new ($%) {
     }
   }
 
+  if( $$self{ option }->{ 'gen-arg-file' } ) {
+    $self->gen_arg_file();
+    exit 0;
+  }
   if( $$self{ option }->{ "show-opts" } ) {
     print "$$self{ prog } Option Values:\n\n";
     my $opt;
@@ -412,11 +492,51 @@ sub opt ($$) {
   }
 }
 
-#
-# Revision Log:
-#
-# %PL%
-#
+sub gen_arg_file ($) {
+  my ($self) = (@_);
+
+  my $out;
+  if( length( $$self{ option }->{ 'arg-file' } ) ) {
+    $out = new IO::File( $$self{ option }->{ 'arg-file' },
+			 "w" );
+    defined( $out ) || croak( "open '".$$self{ option }->{ 'arg-file' }
+			      ."'");
+  } else {
+    $out = new IO::Handle;
+    $out->fdopen(fileno(STDOUT),"w")
+      || croak "open STDOUT???";
+  }
+
+  $out->print( "# Generated arg file\n");
+  foreach my $o (@{$$self{ opt }->{ optnames }}) {
+    if( defined( $$self{ option }->{ $o } )
+	&& $$self{ option }->{ $o }
+      && $o ne "gen-arg-file" ) {
+      $out->printf( "-%-30s  %s\n", $o, $self->opt( $o ) );
+    } else {
+      $out->print( "# -$o\n" );
+    }
+  }
+}
+
+
+sub parse_arg_file ($) {
+  my ($self) = (@_);
+
+  my $in;
+  if( length( $$self{ option }->{ 'arg-file' } ) ) {
+    $in = new IO::File( $$self{ option }->{ 'arg-file' },
+			 "r" );
+    defined( $in )
+      || return( 0 );
+
+    while( <$in> ) {
+      if( /-(\S+)\s+(\S+)/ ) {
+	$$self{ option }->{ $1 } = $2;
+      }
+    }
+  }
+}
 
 # Set XEmacs mode
 #
