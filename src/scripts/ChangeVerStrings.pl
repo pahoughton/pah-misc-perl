@@ -21,7 +21,7 @@ $Doc{ Notes } = "
    For the rest of this programs documentation, either run it
    with -man or see `Detailed Documentation' below.
 ";
-$Doc{ Author } =  [["Paul Houghton","<paul.houghton\@wcom.com>"]];
+$Doc{ Author } =  [["Paul Houghton","<paul.houghton\@mci.com>"]];
 $Doc{ Created } = "04/22/03 17:43";
 
 $Doc{ Last_Mod_By } = '$Author$ ';
@@ -166,6 +166,7 @@ sub main {
 	$hasPerlDoc = 1;
 	$out->print( $_ );
       } else {
+	s/wcom\.com/mci.com/;
 	s/\%PP\%//;
 	s/\%PI\%//;
 	s/\(?\%PF\%\)?//;
