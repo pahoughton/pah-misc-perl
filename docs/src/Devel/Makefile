@@ -106,23 +106,35 @@ PERL_SCRIPT_DIRS	=
 
 PERL_SCRIPT_SOURCES	=
 
-PERL_MODULE_DIRS	=		\
-	$(PRJ_TOPDIR)/src/App/Debug	\
-	$(PRJ_TOPDIR)/src/App/Options	\
-	$(PRJ_TOPDIR)/src/Doc/Self	\
-	$(PRJ_TOPDIR)/src/ParseCxx	\
-	$(PRJ_TOPDIR)/src/Text/Fill	\
-	$(PRJ_TOPDIR)/src/Text/CommaNum	\
-	$(PRJ_TOPDIR)/src/Teamnet
+#PERL_MODULE_DIRS	=		\
+#	$(PRJ_TOPDIR)/src/App/Debug	\
+#	$(PRJ_TOPDIR)/src/App/Options	\
+#	$(PRJ_TOPDIR)/src/Doc/Self	\
+#	$(PRJ_TOPDIR)/src/ParseCxx	\
+#	$(PRJ_TOPDIR)/src/Text/Fill	\
+#	$(PRJ_TOPDIR)/src/Text/CommaNum	\
+#	$(PRJ_TOPDIR)/src/Teamnet
 
-PERL_MODULE_SOURCES	=	\
-	Debug.pm		\
-	Options.pm		\
-	Self.pm			\
+
+#PERL_MODULE_SOURCES	=	\
+#	Debug.pm		\
+#	Options.pm		\
+#	Self.pm			\
+#	ParseCxx.pm		\
+#	Fill.pm			\
+#	CommaNum.pm		\
+#	Teamnet.pm		\
+
+LIB_PERL_DIR	= $(PRJ_TOPDIR)/src
+
+PERL_MODULES		= 	\
+	App::Debug.pm		\
+	App::Options.pm		\
+	Doc::Self.pm		\
 	ParseCxx.pm		\
-	Fill.pm			\
-	CommaNum.pm		\
-	Teamnet.pm		\
+	Text::Fill.pm		\
+	Text::CommaNum.pm	\
+	Teamnet.pm
 
 JAVA_PACKAGES		=
 
