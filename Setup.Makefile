@@ -68,7 +68,7 @@ INSTALL_DOC_HTML_DIR	= $(INSTALL_BASE_DIR)/html
 INSTALL_DOC_MAN_DIR	= $(INSTALL_BASE_DIR)/man
 
 make_cfg_ver		= 6.01
-tools_host		= sideswipe.wcom.com
+tools_host		= soundwave.mcilink.com
 tools_host_dir		= pub/tools
 
 CONFIG_VARS	=		\
