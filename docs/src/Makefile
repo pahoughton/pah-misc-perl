@@ -134,6 +134,16 @@ include Make/make.cfg.targets.doc.$(make_cfg_ver)
 $(SUBDIR_TARGETS)::
 	$(call make_subdirs,$@,$(SUBDIRS),$($(@)_exports) $(exports))
 
+Contacts.xml: Contacts_src.xml
+	$(hide)	mv dtd hide_dtd;	\
+	ret=0;				\
+	GenContactsXml 	     	     	\
+		-source $<		\
+		-dest $@ || ret=1;	\
+	mv hide_dtd dtd;		\
+	exit $$ret
+	@echo "+ Built $@"
+
 html:: $(docs_html_targets)
 
 man:: $(docs_man_targets)
