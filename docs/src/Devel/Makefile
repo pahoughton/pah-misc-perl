@@ -111,14 +111,18 @@ PERL_MODULE_DIRS	=		\
 	$(PRJ_TOPDIR)/src/App/Options	\
 	$(PRJ_TOPDIR)/src/Doc/Self	\
 	$(PRJ_TOPDIR)/src/ParseCxx	\
-	$(PRJ_TOPDIR)/src/Text/Fill
+	$(PRJ_TOPDIR)/src/Text/Fill	\
+	$(PRJ_TOPDIR)/src/Text/CommaNum	\
+	$(PRJ_TOPDIR)/src/Teamnet
 
 PERL_MODULE_SOURCES	=	\
 	Debug.pm		\
 	Options.pm		\
 	Self.pm			\
 	ParseCxx.pm		\
-	Fill.pm
+	Fill.pm			\
+	CommaNum.pm		\
+	Teamnet.pm		\
 
 JAVA_PACKAGES		=
 

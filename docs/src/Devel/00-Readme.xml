@@ -66,6 +66,12 @@
     <item>
       <doc doc="Fill">Text::Fill</doc>
     </item>
+    <item>
+      <doc doc="CommaNum">Text::CommaNum</doc>
+    </item>
+    <item>
+      <doc doc="Teamnet">Teamnet</doc>
+    </item>
   </toc>
 
 </contents>
