@@ -34,6 +34,7 @@ SUBDIRS		=		\
 	App/Debug		\
 	Text/Fill		\
 	Text/CommaNum		\
+	Text/ConvMfName		\
 	Doc/Self		\
 	App/Options		\
 	ParseCxx		\
