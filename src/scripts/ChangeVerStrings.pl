@@ -13,6 +13,7 @@ $Doc{ desc } = "Change Dimention version strings to Cvs and visa vera";
 
 $Doc{ Description } = "
 
+
 ";
 
 $Doc{ Notes } = "
@@ -84,7 +85,7 @@ our @Options =
 			." level, the more debug information is"
 			." output." ],
 
-   [ "files@-",		undef,
+   [ 'files@-',		undef,
 			"file ...",	"req",
 			"file(s) to change",
 			"The file to change the version tags in" ]
@@ -124,27 +125,44 @@ sub main {
 
     my $hasPerlDoc = 0;
     while( <$in> ) {
-      s/\%PP\%//;
-      s/\%PI\%//;
-      s/\(?\%PF\%\)?//;
-      if( /\$Doc/ ) {
-	$hasPerlDoc = 1;
+      if( /^(.*)Last Mod By:\s+\%PO\%/ ) {
+	$out->print( $1,'$Author$ ',"\n" );
+
+      } elsif( /^(.*)Last Mod:\s+\%PRT\%/ ) {
+	$out->print( $1,'$Date$ ',"\n" );
+
+      } elsif( /^(.*)Version:\s+\%PIV\%/ ) {
+	$out->print( $1, '$Name$ ',"\n",
+	       $1, '$Revision$ ',"\n" );
+
+      } elsif( /^(.*)Status:\s+\%PS\%/ ) {
+	$out->print( $1, '$State$ ',"\n" );
+
+      } elsif( /\%PI\%/ ) {
+	# skip
+      } elsif( $hasPerlDoc ) {
+	s/\%PP\%//;
+	s/\(?\%PF\%\)?//;
 	s/\"\%PO\%\"/\'\$Author$ \'/;
 	s/\"\%PRT\%\"/\'\$Date$ \'/;
 	s/^(.*)\"\%PIV\%\"/$1\'\$Revision$ \';\n\$Doc\{ VerTag \}\t    = \'\$Name$ \'/;
 	s/\"\%PS\%\"/\'\$State$ \'/;
-      } else {
-	s/\%PO\%/\$Author$/;
-	s/\%PRT\%/\$Date$/;
-	s/^(.*)\%PIV\%/$1\$Revision$\n$1\$Name$/;
-	s/\%PS\%/\$State$/;
-      }
-      if( $hasPerlDoc ) {
 	s/\"\%PID\%\"/\'\$Id$ \'/;
+	$out->print( $_ );
+      } elsif( /\$Doc/ ) {
+	$hasPerlDoc = 1;
+	$out->print( $_ );
       } else {
+	s/\%PP\%//;
+	s/\%PI\%//;
+	s/\(?\%PF\%\)?//;
+	s/\%PO\%/\$Author$ /;
+	s/\%PRT\%/\$Date$ /;
+	s/^(.*)\%PIV\%/$1\$Name$\n$1\$Revision$ /;
+	s/\%PS\%/\$State$ /;
 	s/\%PID\%/\$Id$/;
+	$out->print( $_ );
       }
-      $out->print( $_ );
     }
   }
 }
