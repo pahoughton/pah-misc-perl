@@ -1,63 +1,60 @@
 #
-# File:         Support.TERM_SIZE
-# Project:	PerlUtils (%PP%)
-# Item:   	%PI% (%PF%)
+# File:		Support.NET_LDAP
+# Project:	PerlUtils 
 # Desc:
 #
 #   
 #
 # Notes:
 #
-# Author:	Paul Houghton - <paul.houghton@wcom.com>
-# Created:	07/29/01 12:31
+# Author(s):   Paul Houghton <paul.houghton@wcom.com>
+# Created:     08/27/2002 07:52
 #
 # Revision History: (See end of file for Revision Log)
 #
-#   Last Mod By:    %PO%
-#   Last Mod:	    %PRT%
-#   Version:	    %PIV%
-#   Status:	    %PS%
+#	$Author$
+#	$Date$
+#	$Name$
+#	$Revision$
+#	$State$
 #
-#   %PID%
+# $Id$
 #
 
-SUPPORT_VAR		= TERM_SIZE
+SUPPORT_VAR		= NET_LDAP
 
-TERM_SIZE_SUPPORT_TYPE	= PERLMOD
+NET_LDAP_SUPPORT_TYPE	= PERLMOD
 
-TERM_SIZE_EXTRACT_DIR	= $(perlmods_build_dir)
-TERM_SIZE_NAME		= Net::LDAP
-TERM_SIZE_VER		= 0.26
-TERM_SIZE_DOC		= Net::LDAP(3)
-TERM_SIZE_DESC_CMD	=						\
-	echo Term::Size is a Perl module which provides a		\
-		straightforward way to retrieve the terminal size.
+NET_LDAP_EXTRACT_DIR	= $(perlmods_build_dir)
+NET_LDAP_NAME		= Net::LDAP
+NET_LDAP_VER		= 0.26
+NET_LDAP_DOC		= Net::LDAP(3)
+NET_LDAP_DESC_CMD	=						\
+	echo Net::LDAP is a collection of modules that implements a 	\
+	     LDAP services API for Perl programs.
 
-TERM_SIZE_BUILD_DIR	= perl-ldap-$(TERM_SIZE_VER)
-TERM_SIZE_tar		= perl-ldap-$(TERM_SIZE_VER).tar.gz
-TERM_SIZE_target	= $(perlmods_lib_os_dir)/Net/LDAP.pm
+NET_LDAP_BUILD_DIR	= perl-ldap-$(NET_LDAP_VER)
+NET_LDAP_module		= Net::LDAP
+NET_LDAP_tar		= perl-ldap-$(NET_LDAP_VER).tar.gz
+NET_LDAP_target		= $(perlmods_lib_dir)/Net/LDAP.pm
 
-$(TERM_SIZE_target): $(tools_archive_dir)/$(TERM_SIZE_tar)
-	$(hide) echo -n "+ Installing $(TERM_SIZE_NAME) ..."	\
-	&& cd $(TERM_SIZE_EXTRACT_DIR)				\
-	&& rm -rf $(TERM_SIZE_BUILD_DIR)			\
-	&& zcat $< | tar xf -					\
-	&& cd $(TERM_SIZE_BUILD_DIR)				\
-	&& perl Makefile.PL $(setup_output)			\
-	&& make $(setup_output)					\
-	&& make test $(setup_output)				\
-	&& make install $(setup_output)				\
+$(NET_LDAP_target): 
+	$(hide) echo -n "+ Installing $(NET_LDAP_NAME) ..."	\
+	&& perl -MCPAN -e 'use CPAN; install( "$(NET_LDAP_module)" );' 	\
 	&& [ -f $@ ]						\
 	&& touch $@						\
 	&& echo " Done -" `date`
 
-TERM_SIZE_rebuild_libs:
+NET_LDAP_rebuild_libs:
 
 
 #
 # Revision Log:
 #
-# %PL%
+# $Log$
+# Revision 1.2  2002/08/27 14:35:34  houghton
+# Changed to use perl CPAN for install.
+#
 #
 
 # Set XEmacs mode
