@@ -49,9 +49,28 @@
         verversionid="%PID%"/>
     <contact>&PRJ.XML.CONTACT;</contact>
   </dochead>
-  
   <release>
-    <version status="devel">&PRJ.VER;</version>
+    <version status="devel">1.02.01</version>
+    <date>8/27/02</date>
+    <desc>
+      <p>
+	Added Teamnet and Text::CommaNum modules.
+      </p>
+      <dl>
+	<dt><doc usedesc="no" doc="Devel/Teamnet">Teamnet</doc></dt>
+	<dd>
+	  Perl module to access WorldCom Teamnet LDAP server.
+	</dd>
+	<dt><doc usedesc="no"
+		 doc="Devel/CommaNum">Text::CommaNum</doc></dt>
+	<dd>
+	  Perl module to add commas to numbers.
+	</dd>
+      </dl>
+    </desc>
+  </release>
+  <release>
+    <version status="devel">1.01.01</version>
     <date>06/15/01</date>
     <ver-mgmt>
       Dimmensions - COS/INFR_OBJS Rel: &PRJ.NAME; &PRJ.VER;
