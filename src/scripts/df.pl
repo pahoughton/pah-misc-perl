@@ -39,8 +39,7 @@ if( ! $real_df )
     die "did NOT find real 'df' in $ENV{PATH}\n";
   }
 
-
-open( DFOUT, "$real_df -k |" );
+open( DFOUT, "$real_df -k @ARGV |" );
 
 print "          Size          Used         Avail  (all values in KB)\n";
 
@@ -58,6 +57,9 @@ while( <DFOUT> )
 
 #
 # $Log$
+# Revision 1.2  1999/05/04 11:42:08  houghton
+# Bug-Fix: was not passing args to real df prog.
+#
 # Revision 1.1  1999/05/03 14:28:38  houghton
 # Initial Version.
 #
