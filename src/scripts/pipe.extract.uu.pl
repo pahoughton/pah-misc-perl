@@ -43,11 +43,11 @@ $mesgDate="";
 
 while(<>) {
 
-  if( /^From: (\S+)/ && ! $mesgFrom ) {
+  if( /^From: \"*(\S+)/ && ! $mesgFrom ) {
     $mesgFrom=$1;
   }
 
-  if( /^Date:.*(\d+) ([A-Z][a-z][a-z]) (\d+)/ ) {
+  if( /^Date:.*[^0-9](\d+) ([A-Z][a-z][a-z]) (\d+)/ ) {
     $mesgDate = sprintf( "%02d%02d%02d", $3 % 100, $Month2Num{$2}, $1 );
     # print "MesgDate: $1 $2 $3 - $mesgDate\n";
   }
@@ -116,6 +116,9 @@ close(MSG);
 
 #
 # $Log$
+# Revision 1.2  2003/05/18 23:46:51  houghton
+# *** empty log message ***
+#
 # Revision 1.1  1997/02/24 15:33:22  houghton
 # Initial Version.
 #

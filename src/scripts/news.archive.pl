@@ -20,18 +20,29 @@
 #   $Id$
 # 
 
+#
+# create a tmp file to store the article in.
+#
 
+$tmpArtFn = "/home/Docs/news/news.arcive.$$";
+
+open( TMP, "> $tmpArtFn" ) || die "open > $tmpArtFn: $!";
+
+#
+# read in the article and get it's 'archive-name'
+#
 while( <> )
   {
-    $article .= $_;
-
+    print TMP $_;
+    
     if( /^archive-name:\s+(\S+)/i )
       {
-	$archiveFn = "/usr/doc/news/news.answers/$1";	
+	$archiveFn = "/home/Docs/news/news.answers/$1";	
       }
   }
 
-# print "$archiveFn\n";
+close( TMP );
+
 
 if( $archiveFn )
   {
@@ -42,14 +53,16 @@ if( $archiveFn )
     if( ! -d $archiveDir )
       {
 	system( "mkdir -p $archiveDir" ) && die "mkdir -p $archiveDir: $!";
-      }
-    
-    open( ART, "> $archiveFn" ) || die "open( > $archiveFn";
-    
-    print ART $article;
+      } 
 
-    close( ART );
+    unlink( "$archiveFn.gz" );
 
+    rename( $tmpArtFn, $archiveFn ) ||
+      die "rename( $tmpArtFn, $archiveFn ): $!";
+
+    system( "gzip $archiveFn" ) &&
+      die "system gzip $archiveFn: $!";
+    
     print STDERR "article wrote to: $archiveFn\n";
   }
 else
@@ -63,6 +76,9 @@ else
 
 #
 # $Log$
+# Revision 1.2  2003/05/18 23:46:51  houghton
+# *** empty log message ***
+#
 # Revision 1.1  1997/02/24 15:33:15  houghton
 # Initial Version.
 #

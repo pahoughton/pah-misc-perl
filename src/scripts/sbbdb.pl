@@ -20,7 +20,7 @@
 #   $Id$
 # 
 
-open( IN, "< /home/houghton/bbdb.tex" ) || die;
+open( IN, "< /home/houghton/.xemacs/bbdb.tex" ) || die;
 
 while ( <IN> ) {
   if ( /^\\beginrecord/ ) {
@@ -95,6 +95,9 @@ while ( <IN> ) {
 
 #
 # $Log$
+# Revision 1.2  2003/05/18 23:46:51  houghton
+# *** empty log message ***
+#
 # Revision 1.1  1999/06/15 17:41:39  houghton
 # Initial Version.
 #

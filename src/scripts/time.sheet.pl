@@ -32,6 +32,8 @@ $LogFile = "$ENV{HOME}/pers/work/status/log";
 		   "CORE",
 		   "TOOLS",
 		   "RATING",
+		   "TRAF",
+		   "BILLPRO",
 		   "CISDESIGN",
 		   "DISTRIB_DB",
 		   "DIST",
@@ -61,6 +63,8 @@ $doubeLine = 07;
 	     "CORE",	"T98033-011\nCentral Repos/TQM",
 	     "TOOLS",	"T98033-013\nTools",
 	     "RATING",	"T98033-015\nRating",
+	     "TRAF",	"A00220-???\nTraffic Lookups",
+	     "BILLPRO", "A00025-???\nBillPro Data WH",
 	     "CISDESIGN",   "T04071-070\nPH I-Dev",
 	     "DISTRIB_DB",  "T04071-050\nDBSS Interface",
 	     "DIST",	    "T04071-060\nDist Development",
@@ -86,7 +90,7 @@ $doubeLine = 07;
 
 @julianDate = (0,31,59,90,120,151,181,212,243,273,304,334);
 @daysInMonth = (31,28,31,30,31,30,31,31,30,31,30,31);
-@daysOfWeek = ("Sat","Sun","Mon","Tue","Wed","Thr","Fri", );
+@daysOfWeek = ("Mon","Tue","Wed","Thr","Fri","Sat","Sun" );
 
 $prevYear      = 0;
 $prevStartTime = 0;
@@ -99,7 +103,7 @@ sub GenTimeSheet
 
   print "Code: PAH  Dept: ????\n";
   
-  print "                     Sat   Sun   Mon   Tue   Wed   Thu   Fri   Total";
+  print "                     Mon   Tue   Wed   Thu   Fri   Sat   Sun   Total";
 
     
   %orderTask = ();
@@ -357,9 +361,9 @@ foreach $taskDateKey (@taskDateKeys)
   if($taskDateKey =~ /^(\d+)\/(\d+)\/(\d+)\s+(\S.+)/)
     {
       $taskMonth    = $1;
-      $taskDate	= $2;
-      $taskYear	= $3;
-      $taskMajor	= $4
+      $taskDate	    = $2;
+      $taskYear	    = $3;
+      $taskMajor    = $4
     }
   else
     {
@@ -376,7 +380,7 @@ foreach $taskDateKey (@taskDateKeys)
     }
       
   $weekDay = (($taskYear - 70) + (($taskYear - 69) / 4)
-	      + 4 + $taskJDate) % 7;
+	      + 2 + $taskJDate) % 7;
   
   if( $dayHours == 0)
     {
@@ -482,6 +486,9 @@ printf("\n-- MONTH HOURS: (%d)  %.2f\n\n",
 
 #
 # $Log$
+# Revision 1.7  2003/05/18 23:46:51  houghton
+# *** empty log message ***
+#
 # Revision 1.6  1997/05/12 11:17:53  houghton
 # Cleanup header and comments.
 #

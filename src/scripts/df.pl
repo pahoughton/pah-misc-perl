@@ -20,7 +20,7 @@
 #   $Id$
 # 
 
-use lib "$ENV{HOME}/scripts/perllib";
+use lib "scripts/perllib";
 
 require "PrettyNum.pl";
 
@@ -59,6 +59,9 @@ while( <DFOUT> )
 
 #
 # $Log$
+# Revision 1.4  2003/05/18 23:46:51  houghton
+# *** empty log message ***
+#
 # Revision 1.3  1999/10/14 11:08:21  houghton
 # Added percent used to output.
 #
