@@ -58,7 +58,7 @@ install install_all:
 
 
 dist_source:
-        $(hide) $(call make_dist_from_cvs,cvs_tag,$(PROJECT_DIR))
+	$(hide) $(call make_dist_from_cvs,cvs_tag,$(PROJECT_DIR))
 
 dist_html:
 	$(call make_subdirs,$@,docs,$($(@)_exports) $(exports))
