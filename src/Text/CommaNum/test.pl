@@ -6,7 +6,7 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 
 use Test;
-BEGIN { plan tests => 1 };
+BEGIN { plan tests => 4 };
 use Text::CommaNum;
 ok(1); # If we made it this far, we're ok.
 
@@ -17,5 +17,10 @@ ok(1); # If we made it this far, we're ok.
 
 my $v;
 $v = Text::CommaNum::CommaNum( 23 );
+ok( $v eq "23" );
+
 $v = Text::CommaNum::CommaNum( 12345.73 );
+ok( $v eq "12,345.73" );
+
 $v = Text::CommaNum::CommaNum( 12345236643 );
+ok( $v eq "12,345,236,643" );
