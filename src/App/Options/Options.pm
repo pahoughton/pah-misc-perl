@@ -258,7 +258,9 @@ sub new ($%) {
 	    }
 	  }
 	} else {
-	  $$self{ option }->{ $optname } = $ENV{ $$o[6] };
+	  if( defined( $ENV{ $$o[6] } ) ) {
+	    $$self{ option }->{ $optname } = $ENV{ $$o[6] };
+	  }
 	}
       }
     }
