@@ -1,0 +1,84 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+# 
+# Title:            find.anon.pl
+# 
+# Description:
+# 
+#   Search the anon ftp list
+# 
+# Notes:
+# 
+# Programmer:	    Paul Houghton - (paul_houghton@wiltel.com)
+# 
+# Start Date:	    12/22/94
+# 
+# Modification History:
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1995/11/17 16:55:33  houghton
+# Initial Version.
+#
+# 
+
+print "@ARGV\n";
+
+for( $a = 0; $a < $#ARGV + 1; $a++ )
+{
+    $match{$ARGV[$a]} = 0;
+    $fldCount++;
+    ($fld,$value) = split(/=/,$ARGV[$a]);
+    
+    $search{"$fld"} = $value;
+
+
+#    print "'$fld' '$value' '$search{$fld}'\n";
+    
+}
+
+open(LIST,"</usr/doc/find/anon.ftp");
+
+while(<LIST>)
+{
+    if(/(^[A-Z][a-z]+)[ \t]*:/)
+    {
+	$sect = $1;
+    }
+
+#    print "$sect\n";
+    
+    if($sect eq "Site" )
+    {
+	$foundMatch = 1;
+	
+	foreach $m (keys( %match ))
+	{
+	    if( $match{$m} < 1 )
+	    {
+		$foundMatch = 0;
+	    }
+	    $match{$m} = 0;
+	}
+	
+	if( $foundMatch )
+	{
+	    print "\n* * * * * * * * * * * * * * * * * * * * * * * * * * * *\n\n";
+	    print $rec;
+	}
+	
+	$rec = $_;
+    }
+    else
+    {
+	$rec .= $_;
+    }
+
+#    print "'$sect' '$search{$sect}' $_";
+
+    if( $search{$sect} && /$search{$sect}/i )
+    {
+	$match{ "$sect=$search{$sect}" }++;
+    }
+}
