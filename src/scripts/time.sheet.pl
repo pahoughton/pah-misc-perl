@@ -18,7 +18,10 @@
 # $Id$
 #
 # $Log$
-# Revision 1.1  1995/11/16 18:05:08  houghton
+# Revision 1.2  1996/10/02 12:07:32  houghton
+# *** empty log message ***
+#
+# Revision 1.1  1995/11/16  18:05:08  houghton
 # Initial Version.
 #
 # 
@@ -33,21 +36,23 @@ $DEBUG = 0;
 	      "CORE",		"05",
 	      "TOOLS",		"06",
 	      "RATING",		"07",
-	      "SICK",		"08",
-	      "ST_DIS",		"09",
-	      "VAC",		"10",
-	      "HOLY",		"11",
-	      "FLOAT",		"12",
-	      "FAM_ILL",	"13",
-	      "BEREAV",		"14",
-	      "INJURY",		"15",
-	      "MIL_LEV",	"16",
-	      "JURY",		"17",
-	      "NP_OVER",	"18",
-	      "INT_MEET",	"19",
-	      "TRAIN",		"20",
-	      "COMP",		"21",
-	      "OTHER",		"22"
+	      "CISDESIGN",	"08",
+	      "DISTRIB",	"09",
+	      "SICK",		"10",
+	      "ST_DIS",		"11",
+	      "VAC",		"12",
+	      "HOLY",		"13",
+	      "FLOAT",		"14",
+	      "FAM_ILL",	"15",
+	      "BEREAV",		"16",
+	      "INJURY",		"17",
+	      "MIL_LEV",	"18",
+	      "JURY",		"19",
+	      "NP_OVER",	"20",
+	      "INT_MEET",	"21",
+	      "TRAIN",		"22",
+	      "COMP",		"23",
+	      "OTHER",		"24"
 	     );
 
 $doubeLine = 07;
@@ -59,6 +64,8 @@ $doubeLine = 07;
 	     "CORE",	"T98033-011\nCentral Repos/TQM",
 	     "TOOLS",	"T98033-013\nTools",
 	     "RATING",	"T98033-015\nRating",
+	     "CISDESIGN", "T04071-070\nPH I-Dev",
+	     "DISTRIB",	"T04071-050\nDBSS Interface",
 	     "SICK",	"Sick",
 	     "ST_DIS",	"Short Trm Dis",
 	     "VAC",	"Vacation",
@@ -108,7 +115,7 @@ sub GenTimeSheet
 
   foreach $k (sort( keys( %orderTask ) ) )
     {
-      if( $k > 7 )
+      if( $k > 9 )
 	{
 	  printf("\n\n%-19s",$taskList{ $orderTask{$k} } );
 	}
@@ -352,6 +359,11 @@ foreach $taskDateKey (@taskDateKeys)
   
   $taskJDate = $julianDate[$taskMonth - 1] + $taskDate;
   
+  if( $taskYear % 4 == 0 && $taskMonth > 2 )	#is it leap year
+    {
+      $taskJDate++;
+    }
+      
   $weekDay = (($taskYear - 70) + (($taskYear - 69) / 4)
 	      + 4 + $taskJDate) % 7;
   
