@@ -1,0 +1,63 @@
+#
+# File:		Support.CONVERT_ASN1
+# Project:	PerlUtils 
+# Desc:
+#
+#   
+#
+# Notes:
+#
+# Author(s):   Paul Houghton <paul.houghton@wcom.com>
+# Created:     08/27/2002 07:55
+#
+# Revision History: (See end of file for Revision Log)
+#
+#	$Author$
+#	$Date$
+#	$Name$
+#	$Revision$
+#	$State$
+#
+# $Id$
+#
+
+SUPPORT_VAR			= CONVERT_ASN1
+
+CONVERT_ASN1_SUPPORT_TYPE	= PERLMOD
+
+CONVERT_ASN1_EXTRACT_DIR	= $(perlmods_build_dir)
+CONVERT_ASN1_NAME		= Convert::ASN1
+CONVERT_ASN1_VER		= 0.15
+CONVERT_ASN1_DOC		= Convert::ASN1(3)
+CONVERT_ASN1_DESC_CMD	=						\
+	echo Convert::ASN1 encodes and decodes ASN.1 data structures	\
+	     using BER/DER rules
+
+CONVERT_ASN1_BUILD_DIR	=
+CONVERT_ASN1_module	= Convert::ASN1
+CONVERT_ASN1_tar	= 
+CONVERT_ASN1_target	= $(perlmods_lib_dir)/Convert/ASN1.pm
+
+$(CONVERT_ASN1_target): 
+	$(hide) echo -n "+ Installing $(CONVERT_ASN1_NAME) ..."	\
+	&& perl -MCPAN -e 					\
+	    'use CPAN; install( "$(CONVERT_ASN1_module)" );'	\
+	    $(setup_output) 					\
+	&& [ -f $@ ]						\
+	&& touch $@						\
+	&& echo " Done -" `date`
+
+CONVERT_ASN1_rebuild_libs:
+
+
+#
+# Revision Log:
+#
+# %PL%
+#
+
+# Set XEmacs mode
+#
+# Local Variables:
+# mode:makefile
+# End:
