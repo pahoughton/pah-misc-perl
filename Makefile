@@ -39,7 +39,7 @@ include $(config_dir)/00-Makefile.cfg
 
 SUBDIRS		= docs src test
 
-TARGETS		= $(standard_targets) dist dist_html
+TARGETS		= $(standard_targets) dist_source dist_html
 
 HELP_TARGETS	= $(TARGETS)
 
@@ -58,7 +58,7 @@ install install_all:
 
 
 dist_source:
-	$(call make_dist_from_cvs,$(cvs_tag),$(PROJECT_DIR))
+        $(hide) $(call make_dist_from_cvs,cvs_tag,$(PROJECT_DIR))
 
 dist_html:
 	$(call make_subdirs,$@,docs,$($(@)_exports) $(exports))
