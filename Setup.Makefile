@@ -27,8 +27,8 @@ SHELL	= /bin/ksh
 hide	= @
 
 PROJECT_NAME		= PerlUtils
-PROJECT_VER_MAJOR	= 1
-PROJECT_VER_MINOR	= 02
+PROJECT_VER_MAJOR	= 2
+PROJECT_VER_MINOR	= 01
 PROJECT_VER_RELEASE	= 01
 
 PROJECT_VER_MGMT	= DIM
@@ -39,10 +39,10 @@ PROJECT_VER_DIM_RELEASE	= \
 	$(PROJECT_VER_MAJOR).$(PROJECT_VER_MINOR).$(PROJECT_VER_RELEASE)
 
 PROJECT_VER_PROD	= $(PROJECT_VER_MAJOR).$(PROJECT_VER_MINOR)
-PROJECT_VER_PREV	= 1.01.01
+PROJECT_VER_PREV	= 1.02.01
 
 PROJECT_CONTACT_NAME	= Paul Houghton
-PROJECT_CONTACT_EMAIL	= Paul.Houghton@wcom.com
+PROJECT_CONTACT_EMAIL	= Paul.Houghton@mci.com
 
 PROJECT_DESC	=							\
 	$(PROJECT_NAME) is a collection of generic perl modules and scripts.
@@ -67,7 +67,7 @@ INSTALL_JAVA_DIR	= $(INSTALL_BASE_DIR)/share/java
 INSTALL_DOC_HTML_DIR	= $(INSTALL_BASE_DIR)/html
 INSTALL_DOC_MAN_DIR	= $(INSTALL_BASE_DIR)/man
 
-make_cfg_ver		= 6.01
+make_cfg_ver		= 7.01
 tools_host		= soundwave.mcilink.com
 tools_host_dir		= pub/tools
 
