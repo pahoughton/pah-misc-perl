@@ -25,7 +25,7 @@
 
 
 package Text::Fill;
-require 5.6.0;
+require 5.006_001;
 use strict;
 use warnings;
 our $VERSION = "1.01";

@@ -1,5 +1,5 @@
 package Doc::Self;
-require 5.6.0;
+require 5.006_001;
 use strict;
 use warnings;
 
