@@ -48,6 +48,9 @@ include Make/make.cfg.targets.common.$(make_cfg_ver)
 default check install_debug install_default install_lib_all:
 	$(call make_subdirs,$@,src,$($(@)_exports))
 
+rebuild_support_libs:
+	$(call rebuild_libs,$(SUPPORT_ITEMS))
+
 install install_all:
 	$(call make_subdirs,$@,src docs,$($(@)_exports))
 
