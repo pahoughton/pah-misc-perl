@@ -1,0 +1,67 @@
+#
+# File:         Support.TERM_SIZE
+# Project:	PerlUtils (%PP%)
+# Item:   	%PI% (%PF%)
+# Desc:
+#
+#   
+#
+# Notes:
+#
+# Author:	Paul Houghton - <paul.houghton@wcom.com>
+# Created:	07/29/01 12:31
+#
+# Revision History: (See end of file for Revision Log)
+#
+#   Last Mod By:    %PO%
+#   Last Mod:	    %PRT%
+#   Version:	    %PIV%
+#   Status:	    %PS%
+#
+#   %PID%
+#
+
+SUPPORT_VAR		= TERM_SIZE
+
+TERM_SIZE_SUPPORT_TYPE	= PERLMOD
+
+TERM_SIZE_EXTRACT_DIR	= $(perlmods_build_dir)
+TERM_SIZE_NAME		= Net::LDAP
+TERM_SIZE_VER		= 0.26
+TERM_SIZE_DOC		= Net::LDAP(3)
+TERM_SIZE_DESC_CMD	=						\
+	echo Term::Size is a Perl module which provides a		\
+		straightforward way to retrieve the terminal size.
+
+TERM_SIZE_BUILD_DIR	= perl-ldap-$(TERM_SIZE_VER)
+TERM_SIZE_tar		= perl-ldap-$(TERM_SIZE_VER).tar.gz
+TERM_SIZE_target	= $(perlmods_lib_os_dir)/Net/LDAP.pm
+
+$(TERM_SIZE_target): $(tools_archive_dir)/$(TERM_SIZE_tar)
+	$(hide) echo -n "+ Installing $(TERM_SIZE_NAME) ..."	\
+	&& cd $(TERM_SIZE_EXTRACT_DIR)				\
+	&& rm -rf $(TERM_SIZE_BUILD_DIR)			\
+	&& zcat $< | tar xf -					\
+	&& cd $(TERM_SIZE_BUILD_DIR)				\
+	&& perl Makefile.PL $(setup_output)			\
+	&& make $(setup_output)					\
+	&& make test $(setup_output)				\
+	&& make install $(setup_output)				\
+	&& [ -f $@ ]						\
+	&& touch $@						\
+	&& echo " Done -" `date`
+
+TERM_SIZE_rebuild_libs:
+
+
+#
+# Revision Log:
+#
+# %PL%
+#
+
+# Set XEmacs mode
+#
+# Local Variables:
+# mode:makefile
+# End:
