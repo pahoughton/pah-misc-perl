@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="US-ASCII"?>
-<!DOCTYPE contacts
-	PUBLIC "-//DocTools//DTD Contact List//EN" 
-	       "dtd/DocTools/contacts.dtd" [
-
+<!DOCTYPE contacts PUBLIC "-//DocTools//DTD Contact List//EN" "dtd/DocTools/contacts.dtd" [
  <!ENTITY TOP.DIR ".">
- <!ENTITY % projectEntity
-	PUBLIC "-//Project//ENTITY Project Variables//EN"
-	       "./dtd/project.ent">
+ <!ENTITY % projectEntity PUBLIC "-//Project//ENTITY Project Variables//EN" "./dtd/project.ent">
  %projectEntity;
 ]>
-
-<?xml-stylesheet
-    href="xsl/DocTools/html/contacts.xsl"
+<?xml-stylesheet href="xsl/DocTools/html/contacts.xsl"
     type="text/xsl" ?>
-
 <contacts>
   <dochead>
     <title>
@@ -29,49 +21,33 @@
        
     </keywords>
     <authorgrp>
-      <author fullname="Paul Houghton"
-	      email="paul.houghton@wcom.com"/>
+      <author fullname="Paul Houghton" email="paul.houghton@wcom.com"/>
     </authorgrp>
     <projectname>
       &PRJ.NAME;
     </projectname>
-    <docversion
-        created="06/13/01 11:29"
-        verprj="%PP%"
-        veritem="%PI% (%PF%)"
-	verlastmodby="%PO%"
-        verlastmod="%PRT%"
-        verversion="%PIV%"
-	verstatus="%PS%"
-        verversionid="%PID%"/>
+    <docversion created="06/13/01 11:29" verlastmodby="$Author$" verlastmod="$Date$" verversion="$Revision$" verstatus="$State$" verversionid="$Id$"/>
     <contact>&PRJ.XML.CONTACT;</contact>
   </dochead>
 
   <contact-list>      
     <who>
       <role>Manager</role>
-      <name>Doyle Munday</name>
       <email>doyle.munday@wcom.com</email>
-      <phone>214-561-5302</phone>
-    </who>
+    <name>Kenneth D Munday</name><phone>972-753-4366</phone><vnet>926-4366</vnet></who>
     <who>
       <role>Project Lead / Developer</role>
-      <name>Paul Houghton</name>
       <email>paul.houghton@wcom.com</email>
-      <phone>719-527-7834</phone>
-    </who>
+    <name>Paul A Houghton</name><phone>719-535-3209</phone><vnet>622-3209</vnet></who>
   </contact-list>
 
 </contacts>
-
 <!-- Revision Log:
 
   %PL%
 
 -->
-
 <!-- Xemacs Local Variables -->
-
 <!-- Local Variables: -->
 <!-- mode:xml -->
 <!-- End: -->
