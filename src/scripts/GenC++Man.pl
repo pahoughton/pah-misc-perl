@@ -5,7 +5,8 @@
 # 
 # Description:
 # 
-# 	
+#   Generate a man page from a C++ header file that
+#   Contains correctly formated comments.
 # 
 # Notes:
 # 
@@ -13,20 +14,30 @@
 # 
 # Start Date:	    04/17/96 10:59
 # 
-# Modification History:
+# Revision History: (See end of file for Revision Log)
 #
 # $Id$
-#
-# $Log$
-# Revision 1.2  1996/10/26 10:34:45  houghton
-# on-going development and improvements.
-#
-# Revision 1.1  1996/10/02 12:07:42  houghton
-# *** empty log message ***
-#
-# 
 
-sub PrintMeth
+@SectionOrder = ("TITLE",
+		 "NAME",
+		 "SYNOPSIS",
+		 "DESCRIPTION",
+		 "CONSTANTS",
+		 "MACROS",
+		 "FUNCTIONS",
+		 "CONSTRUCTORS",
+		 "PUBLIC INTERFACE",
+		 "ASSOCIATED MACROS",
+		 "ASSOCIATED FUNCTIONS",
+		 "EXAMPLE",
+		 "SEE ALSO",
+		 "FILES",
+		 "AUTHOR" );
+
+		 
+$DEBUG = 1;	 
+		 
+sub FormatMethText
   {
     my $desc = pop( @_ );
     my $const = pop( @_ );
@@ -35,32 +46,43 @@ sub PrintMeth
     my $ret = pop( @_ );
     my $type = pop( @_ );
 
-    print ".PD 0\n";
+    my $text;
+
+    if( $DEBUG )
+      {
+	print STDERR "name: $name\n";
+	print STDERR "type: $type\n";
+	print STDERR "ret: $ret\n";
+	print STDERR "args: $args\n";
+	print STDERR "const: $const\n\n";
+      }
+
+    $text = ".PD 0\n";
     
     if( $type )
       {
-	print "$type\n.PP\n";
+	$text .= "$type\n.PP\n";
       }
     if( $ret )
       {
-	print "$ret\n.PP\n";
+	$text .= "$ret\n.PP\n";
       }
     
     if( $name )
       {
-	print "$name(";
+	$text .= "$name(";
 
-	if( length( $args ) < 40 )
+	if( length( $args ) < 50 )
 	  {
 	    if( ! $args )
 	      {
-		$args = "void";
+		$args = "";
 	      }
-	    print "$args) $methConst\n";
+	    $text .= "$args) $methConst\n";
 	  }
 	else
 	  {
-	    print "\n.RS 2\n";
+	    $text .= "\n.RS 2\n";
 	    
 	    my $argOut = "";
 	
@@ -81,17 +103,19 @@ sub PrintMeth
 		    $argName = $2;
 		  }
 		$argName =~ s/\\/\\\\/g;
-		$argOut .= ".TP 20\n$argType\n$argName,\n";
+		$argOut .= ".TP 25\n$argType\n$argName,\n";
 	      }
 	    chop $argOut;
 	    chop $argOut;
 	    
-	    print "$argOut ) $methConst\n.RE\n";
+	    $text .= "$argOut ) $methConst\n.RE\n";
 	  }
       }
-    print ".PD\n.PP\n.RS\n";    
-    print "$desc\n.";
-    print "RE\n.PP\n";
+    $text .= ".PD\n.PP\n.RS\n";    
+    $text .= "$desc\n";
+    $text .= ".RE\n.PP\n";
+
+    $text;
   }
   
 $SourceFile = $ARGV[0];
@@ -153,172 +177,307 @@ if( $VersionTag =~ /(\d\d\d\d)\/(\d\d*)\/(\d\d*)/ )
 {
   $Date = "$2/$3/$1";
 }
-print ".TH $ClassName 3 \"\" \"$Date\" \"$PrjName\"\n";
-print ".SH NAME\n$ClassName\n";
+
+$Man{ "TITLE" } = ".TH $ClassName 3 \"\" \"$Date\" \"$PrjName\"\n";
+$Man{ "NAME" } = ".SH NAME\n$ClassName\n";
 
 if( $VersionTag )
 {
-  print ".PP\n$VersionTag\n.PD\n";
+  $Man{ "NAME" } .= ".PP\n$VersionTag\n.PD\n";
 }
 
-print ".SH DESCRIPTION\n";
+$Man{ "SYNOPSIS" } = ".SH SYNOPSIS\n";
+$Man{ "SYNOPSIS" } .= "#include <$ClassName.hh>\n";
+$Man{ "SYNOPSIS" } .= ".PP\n";
+if( $SectionText{ "Public Interface" } )
+{
+  $Man{ "SYNOPSIS" } .= "$ClassName  obj;\n";
+}
+$Man{ "DESCRIPTION" } = ".SH DESCRIPTION\n";
 
 $SectionText{ "Desc" } =~ s/\/\/ *//g;
-$SectionText{ "Desc" } =~ s/^\n//;
-$SectionText{ "Desc" } =~ s/[\t ]*\n[ \t]*\n/\n.PP\n/;
+$SectionText{ "Desc" } =~ s/\\/\\\\/g;
+$SectionText{ "Desc" } =~ s/^[ \t]*\n//;
+$SectionText{ "Desc" } =~ s/[\t ]*\n[ \t]*\n/.PP/mg;
 $SectionText{ "Desc" } =~ s/[\n\t ]*$//;
+$SectionText{ "Desc" } =~ s/[ \t]+/ /g;
+$SectionText{ "Desc" } =~ s/\n//g;
+$SectionText{ "Desc" } =~ s/\.PP/\n.PP\n/g;
+$SectionText{ "Desc" } =~ s/^[ \t]+//mg;
 
-print $SectionText{ "Desc" } . "\n";
 
-print ".SH Constructors\n";
 
-$SectionText{ "Constructors" } =~ s/^\/\///mg;
+$Man{ "DESCRIPTION" } .= $SectionText{ "Desc" } . "\n";
 
-# print $SectionText{ "Constructors" } . "\n";
-  
-foreach $ln (split(/\n/,$SectionText{ "Constructors" }))
+if( $SectionText{ "Constants" } )
 {
-  if( $ln =~ /^ {0,5}[ \t]([A-Za-z_]+)[ \t]*\(([^\)]+)(\)*)/ )
-    {
-      if( $meth )
-	{
-#	  print "$methArgs\n";
-	  &PrintMeth( "",$meth,$methArgs,"",$methDesc);
-	}
-      $meth = $1;
-      $methArgs = $2;
-      $allArgs = $3;
-      $methDesc = "";
+  $SectionText{ "Constants" } =~ s/^\/\///mg;
+  
+  $Man{ "CONSTANTS" } = ".SH CONSTANTS\n";
+  $Man{ "CONSTANTS" } .= ".PD 0\n";
 
-      next;
+  $constName = "";
+  $constDesc = "";
+  
+  foreach $ln (split( /\n/, $SectionText{ "Constants" } ) )
+    {
+      if( $ln =~ /^ {0,5}[ \t]([A-Z_]+)/ )
+	{
+	  if( $constName )
+	    {
+	      $Man{ "CONSTANTS" } .= "$constName\n";
+	      $Man{ "CONSTANTS" } .= ".PD\n.PP\n.RS\n";
+	      $Man{ "CONSTANTS" } .= "$constDesc\n";
+	      $Man{ "CONSTANTS" } .= ".RE\n.PP\n";
+	    }
+	  $constName = $1;
+	  $constDesc = "";
+	}
+      else
+	{
+	  $ln =~ s/^[ \t]*//;
+	  $ln =~ s/[ \t]+/ /g;
+	  $constDesc .= $ln;
+	}
     }
   
-  if( ! $allArgs )
+  if( $constName )
     {
-      if( $ln =~ /^[ \t]+([^\)]+)(\)*)/ )
-	{
-	  $methArgs .= $1;
-	  $allArgs = $2;
-	}
-    }
-  else
-    {
-      $ln =~ s/^[ \t]*//;
-      $ln =~ s/[ \t]+/ /g;
-      $methDesc .= "$ln ";
+      $Man{ "CONSTANTS" } .= "$constName\n";
+      $Man{ "CONSTANTS" } .= ".PD\n.PP\n.RS\n";
+      $Man{ "CONSTANTS" } .= "$constDesc\n";
+      $Man{ "CONSTANTS" } .= ".RE\n.PP\n";
     }
 }
 
-&PrintMeth( "","",$meth,$methArgs,"",$methDesc);
+if( $SectionText{ "Constructors" } )
+{
+  $Man{ "CONSTRUCTORS" } = ".SH CONSTRUCTORS\n";
+
+  $SectionText{ "Constructors" } =~ s/^\/\///mg;
+
+  # print $SectionText{ "Constructors" } . "\n";
+  
+  foreach $ln (split(/\n/,$SectionText{ "Constructors" }))
+    {
+      if( $ln =~ /^ {0,5}[ \t]([A-Za-z_]+)[ \t]*\(([^\)]+)(\)*)/ )
+	{
+	  if( $meth )
+	    {
+	      #	  print "$methArgs\n";
+	      $Man{ "CONSTRUCTORS" } .=
+		FormatMethText( "",$meth,$methArgs,"",$methDesc);
+	    }
+	  $meth = $1;
+	  $methArgs = $2;
+	  $allArgs = $3;
+	  $methDesc = "";
+	  
+	  next;
+	}
+  
+      if( ! $allArgs )
+	{
+	  if( $ln =~ /^[ \t]+([^\)]+)(\)*)/ )
+	    {
+	      $methArgs .= $1;
+	      $allArgs = $2;
+	    }
+	}
+      else
+	{
+	  $ln =~ s/^[ \t]*//;
+	  $ln =~ s/[ \t]+/ /g;
+	  $methDesc .= "$ln ";
+	}
+    }
+}
+
+$Man{ "CONSTRUCTORS" } .= FormatMethText( "","",$meth,$methArgs,"",$methDesc);
+
 $meth = "";
 
-print ".SH Public Interface\n";
-
-$SectionText{ "Public Interface" } =~ s/^\/\///mg;
-
-foreach $ln (split(/\n/,$SectionText{ "Public Interface" }))
-{
-  if( $ln =~ /^ {0,5}[ \t]((inline)|(virtual)|(static))\s*$/ )
-    {
-      if( $meth )
-	{
-	  &PrintMeth( $methType,$methRet,$meth,$methArgs,$methConst,$methDesc);
-	  $methRet = "";
-	  $meth = "";
-	  $methConst = "";
-	  $methDesc = "";
-	}
-      $methType = $1;
-      next;
-    }
-       
-  if( $ln =~ /^ {0,5}[ \t]([^ \t][^(]+)$/ )
-    {
-      if( $meth )
-	{
-	  &PrintMeth( $methType,$methRet,$meth,$methArgs,$methConst,$methDesc);
-	  $methType = "";
-	  $meth = "";
-	  $methConst = "";
-	  $methDesc = "";
-	}
-      $methRet = $1;
-      next;
-    }
    
-  if( $ln =~ /^ {0,5}[ \t]([^ \t][^\(]+)[ \t]*\(([^\)]+)(\)*)[ \t]*([const]*)/ )
-    {
-      if( $meth )
-	{
-	  &PrintMeth( $methType,$methRet,$meth,$methArgs,$methConst,$methDesc);
-	  $methRet = "";
-	  $methType = "";
-	  $methDesc = "";
-	}
-      $meth = $1;
-      $methArgs = $2;
-      $allArgs = $3;
-      $methConst = $4;
-      $methDesc = "";
-      
-      next;
-    }
+foreach $sect ("Macros",
+	       "Public Interface",
+	       "Protected Interaface",
+	       "Private Interface",
+	       "Associated Macros",
+	       "Associated Functions",
+	       "Functions" )
+{
+  $SectionText{ $sect } =~ s/^\/\///mg;
   
-  if( ! $allArgs )
+  if( $SectionText{ $sect } =~ /[^ \t\n]/ )
     {
-      if( $ln =~ /^[ \t]+([^\)]+)(\)*)[ \t]*([const]*)/ )
-	{
-	  $methArgs .= $1;
-	  $allArgs = $2;
-	  $methConst = $3;
-	}
-      next;
+      $Section = $sect;
+      $Section =~ tr/a-z/A-Z/;
+     
+      $Man{ $Section } = ".SH $Section\n";
     }
 
-  $ln =~ s/^[ \t]*//;
-  $ln =~ s/[ \t]+/ /g;
-  $methDesc .= "$ln ";
+  foreach $ln (split(/\n/,$SectionText{ $sect }))
+    {
+      # look for method type
+      if( $ln =~ /^ {0,5}[ \t]((inline)|(virtual)|(static)|(template.*))\s*$/ )
+	{
+	  if( $meth )
+	    {
+	      $Man{ $Section } .= FormatMethText( $methType,
+						 $methRet,
+						 $meth,
+						 $methArgs,
+						 $methConst,
+						 $methDesc);
+	      $methRet = "";
+	      $meth = "";
+	      $methConst = "";
+	      $methDesc = "";
+	    }
+	  $methType = $1;
+	  next;
+	}
+
+      # look for return type
+      if( $ln =~ /^ {0,5}[ \t]([^ \t][^(]*)$/ )
+        {
+	  if( $meth )
+	    {
+	      $Man{ $Section } .= FormatMethText( $methType,
+						$methRet,
+						$meth,
+						$methArgs,
+						$methConst,
+						$methDesc );
+	      $methType = "";
+	      $meth = "";
+	      $methConst = "";
+	      $methDesc = "";
+	    }
+	  $methRet = $1;
+	  next;
+	}
+
+  # look for method and args
+      if( $ln =~ /^ {0,5}[ \t]([^ \t][^\(]+)[ \t]*\(([^\)]*)(\)*)[ \t]*([const]*)/ )
+	{
+	  if( $meth )
+	    {
+	      $Man{ $Section } .= FormatMethText( $methType,
+						 $methRet,
+						 $meth,
+						 $methArgs,
+						 $methConst,
+						 $methDesc );
+	      $methRet = "";
+	      $methType = "";
+	      $methDesc = "";
+	    }
+	  $meth = $1;
+	  $methArgs = $2;
+	  $allArgs = $3;
+	  $methConst = $4;
+	  $methDesc = "";
+	  
+	  next;
+	}
+      
+      if( ! $allArgs )
+	{
+	  if( $ln =~ /^[ \t]+([^\)]+)(\)*)[ \t]*([const]*)/ )
+	    {
+	      $methArgs .= $1;
+	      $allArgs = $2;
+	      $methConst = $3;
+	    }
+	  next;
+	}
+      
+      $ln =~ s/^[ \t]*//;
+      $ln =~ s/[ \t]+/ /g;
+      $ln =~ s/\\/\\\\/g;
+      $methDesc .= "$ln ";
+      
+    }
   
+  if( $methRet || $meth )
+    {
+      $Man{ $Section } .= FormatMethText( $methType,
+					 $methRet,
+					 $meth,
+					 $methArgs,
+					 $methConst,
+					 $methDesc);
+      $methType = "";
+      $methRet = "";
+      $meth = "";
+      $methArgs = "";
+      $methConst = "";
+      $methDesc = "";
+    }
 }
 
-  &PrintMeth( $methType,$methRet,$meth,$methArgs,$methConst,$methDesc);
+$SectionText{ "Example" } =~ s/^\/\///mg;
 
-  $SectionText{ "Example" } =~ s/^\/\///mg;
-
-  if( $SectionText{ "Example" } )
+if( $SectionText{ "Example" } )
+{
+  $Man{ "EXAMPLE" } = ".SH EXAMPLE\n";
+  $Man{ "EXAMPLE" } .= ".nf\n";
+  foreach $ln (split(/\n/,$SectionText{ "Example" }))
     {
-      print ".SH EXAMPLE\n";
-      print ".nf\n";
-      print $SectionText{ "Example" };
-      print ".fn\n";
+      $ln =~ s/^\t//;
+      $Man{ "EXAMPLE" } .= "$ln \n";
     }
+  #      print $SectionText{ "Example" };
+  $Man{ "EXAMPLE" } .= ".fn\n";
+}
 
-  $SectionText{ "See Also" } =~ s/^\/\///mg;
-  $SectionText{ "See Also" } =~ s/^[ \t]*//;
-  $SectionText{ "See Also" } =~ s/[ \t]+/ /g;
+$SectionText{ "See Also" } =~ s/^\/\///mg;
+$SectionText{ "See Also" } =~ s/^[ \t]*//;
+$SectionText{ "See Also" } =~ s/[ \t]+/ /g;
+
+if( $SectionText{ "See Also" } )
+{
+  $Man{ "SEE ALSO" } = ".SH SEE ALSO";
+  $Man{ "SEE ALSO" } .= $SectionText{ "See Also" };
+  $Man{ "SEE ALSO" } .= "\n";
+}
+
+$SectionText{ "Files" } =~ s/^\/\///mg;
+$SectionText{ "Files" } =~ s/^[ \t]*//;
+$SectionText{ "Files" } =~ s/[ \t]+/ /g;
+
+if( $SectionText{ "Files" } )
+{
+  $Man{ "FILES" } = ".SH FILES";
+  $Man{ "FILES" } .= $SectionText{ "Files" };
+  $Man{ "FILES" } .= "\n";
+}
+
+$SectionText{ "Author" } =~ s/^ \t//;
+$Man{ "AUTHOR" } = ".SH AUTHOR\n";
+$Man{ "AUTHOR" } .= $SectionText{ "Author" } . "\n";
   
-  if( $SectionText{ "See Also" } )
-    {
-      print ".SH SEE ALSO";
-      print $SectionText{ "See Also" };
-      print "\n";
-    }
-
-  $SectionText{ "Files" } =~ s/^\/\///mg;
-  $SectionText{ "Files" } =~ s/^[ \t]*//;
-  $SectionText{ "Files" } =~ s/[ \t]+/ /g;
-
-  if( $SectionText{ "Files" } )
-    {
-      print ".SH FILES";
-      print $SectionText{ "Files" };
-      print "\n";
-    }
+foreach $sect (@SectionOrder)
+  {
+    if( $Man{ $sect } )
+      {
+	print $Man{ $sect };
+      }
+  }
     
-  print ".SH AUTHOR\n";
-
-  $SectionText{ "Author" } =~ s/^ \t//;
-  print $SectionText{ "Author" } . "\n";
   
-
-  
+#
+# Revision Log:
+#
+# $Log$
+# Revision 1.3  1996/11/14 23:15:32  houghton
+# Complete Rework.
+#
+# Revision 1.2  1996/10/26 10:34:45  houghton
+# on-going development and improvements.
+#
+# Revision 1.1  1996/10/02 12:07:42  houghton
+# *** empty log message ***
+#
+# 
