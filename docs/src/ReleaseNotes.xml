@@ -40,17 +40,15 @@
     </projectname>
     <docversion
         created="02/13/01 08:56"
-        verprj="%PP%"
-        veritem="%PI% (%PF%)"
-	verlastmodby="%PO%"
-        verlastmod="%PRT%"
-        verversion="%PIV%"
-	verstatus="%PS%"
-        verversionid="%PID%"/>
+	verlastmodby="$Author$"
+        verlastmod="$Date$"
+        verversion="$Revision$"
+	verstatus="$State$"
+        verversionid="$Id$"/>
     <contact>&PRJ.XML.CONTACT;</contact>
   </dochead>
   <release>
-    <version status="devel">1.02.01</version>
+    <version status="prod">1.02.01</version>
     <date>8/27/02</date>
     <desc>
       <p>
@@ -107,7 +105,10 @@
 
 <!-- Revision Log:
 
-  %PL%
+  $Log$
+  Revision 1.4  2002/08/27 14:45:02  houghton
+  Changed Version tags to CVS.
+
 
 -->
 
