@@ -46,11 +46,11 @@ GZIP_build_dir		= $(GZIP_NAME)-$(GZIP_VER)
 GZIP_tar		= $(tools_archive_dir)/gzip-$(GZIP_VER).tar
 GZIP_target		= $(tools_bin_dir)/gzip
 
-MAKC_CONFIGS_EXTRACT_DIR	= $(tools_build_dir)
+MAKE_CONFIGS_EXTRACT_DIR	= $(tools_build_dir)
 MAKE_CONFIGS_NAME		= MakeConfigs
 MAKE_CONFIGS_VER		= $(make_cfg_ver)
 MAKE_CONFIGS_DOC		= $(INSTALL_DOC_HTML_DIR)/Tools/MakeConfigs
-MAKE_CONFIGS_DESC_CMD		=
+MAKE_CONFIGS_DESC_CMD		= \
 	cat $(MAKE_CONFIGS_EXTRACT_DIR)/$(MAKE_CONFIGS_build_dir)/src/config/.prjdesc.txt
 MAKE_CONFIGS_build_dir		= $(MAKE_CONFIGS_NAME)-$(MAKE_CONFIGS_VER)
 MAKE_CONFIGS_tar		= \

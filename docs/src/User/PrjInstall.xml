@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE contents SYSTEM "../dtd/common/DocTools/contents.dtd" [
+ <!ENTITY % TOP.DIR "..">
+ <!ENTITY % projectEntity SYSTEM "../dtd/project.ent">
+ %projectEntity;
+]>
+<prjdoc>
+  <dochead>
+    <title>
+       &PRJ.NAME; Project Installation Documentation
+    </title>
+    <subtitle>
+       
+    </subtitle>
+    <docdesc>
+      This document describes how to install a specific version of
+      &PRJ.NAME; as part of your project. Provides a Makefile segment
+      that you can add to your setup target which will configure and
+      install &PRJ.NAME;.
+    </docdesc>
+    <keywords>
+       
+    </keywords>
+    <authorgrp>
+      <author fullname="Paul Houghton"
+	      email="Paul.Houghton@wcom.com"/>
+    </authorgrp>
+    <projectname>
+      &PRJ.NAME;
+    </projectname>
+    <docversion
+        created="02/13/01 13:14"
+        verprj="%PP%"
+        veritem="%PI% (%PF%)"
+	verlastmodby="%PO%"
+        verlastmod="%PRT%"
+        verversion="%PIV%"
+	verstatus="%PS%"
+        verversionid="%PID%"/>
+    <contact>&PRJ.XML.CONTACT;</contact>
+  </dochead>
+
+  <body>
+    <p>
+      Note: these instructions assume you are using ksh for your shell
+      and GNU's make program. You should also check
+      <doc>Prerequisites</doc> before you get started.
+    </p>
+    
+    <sect>
+      <heading>Directory Structure and Environment Variables</heading>
+      <sectbody>
+      <p>
+	The setup and installation process retrieves and installs a
+	number of components needed by &PRJ.NAME;. To accomidate
+	automated setup and installation, a specific subdirectory
+	structure is required. The root of this subdirectory structure
+	is referenced by the TOOL_DIR environment variable.
+      </p>
+      <p>
+	You can use any existing directory for TOOL_DIR. I recommend
+	creating a Support directory at the same level as your
+	projects top dirctory. For example, lets say your project is
+	currently in the directory /Projects/CoolStuff. The first
+	thing you would do is create a 'Devel' directory at the same
+	level as your current project directory, then you would move
+	your project directory into the Devel directory. Now create a
+	Support directory at the same level as your project
+	directory. This new directory will be used for all the
+	external support tools and libraries your project needs.
+      </p>
+      <p>
+	Here are the commands you would need to execute:
+      </p>
+      <p>
+	<indent>
+	  <code>
+	    cd /Projects<br/>
+	    mkdir Devel<br/>
+	    mv CoolStuff Devel<br/>
+	    cd Devel
+	    mkdir Support
+	    export TOOL_DIR=/Projects/Devel/Support<br/>
+	    PATH=$TOOL_DIR/bin:$PATH<br/>
+	    MANPATH=$TOOL_DIR/man:$MANPATH<br/>
+	  </code>
+	</indent>
+      </p>
+      <p>
+	You should update your ~/.profile to include the settings of the
+	TOOL_DIR, PATH and MANPATH environment variables.
+      </p>
+      </sectbody>
+    </sect>
+    
+    <sect>
+      <heading>Create/Update your support/Support.Makefile</heading>
+      <sectbody>
+	<p>
+	The following Makefile segment will automatically retrieve, setup and
+	install &PRJ.NAME;.
+      </p>
+      <p>
+	<indent><ulink>Support.Makefile</ulink></indent>
+      </p>
+      <p>
+	You will also need a copy of AnonFtp.ksh in your support
+	directory. This is available via anonymous ftp from:
+      </p>
+      <p>
+	<indent>
+	  <ulink>ftp://sideswipe.wcom.com/pub/tools/AnonFtp.ksh</ulink>
+	</indent>
+      </p>
+      <p>
+	Once you have a copy of AnonFtp.ksh, move it to your `support'
+	directory and change it's permissions to make it executeable.
+      </p>
+      <p>
+	<indent>
+	  <code>
+	    cd /Projects/Devel/CoolStuff/support<br/>
+	    mv $HOME/AnonFtp.ksh .<br/>
+	    chmod +x AnonFtp.ksh<br/>
+	  </code>
+	</indent>
+      </p>
+      </sectbody>
+    </sect>
+    
+  </body>
+</prjdoc>
+
+<!-- Revision Log:
+
+#
+# %PL%
+#
+
+-->
+
+<!-- Xemacs Local Variables -->
+
+<!-- Local Variables: -->
+<!-- mode:xml -->
+<!-- End: -->

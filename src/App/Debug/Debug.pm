@@ -12,8 +12,8 @@ use warnings;
 
 our %Doc;
 $Doc{ File }	=   "Debug.pm";
-$Doc{ Project } =   ["PerlUtils","%PP%"];
-$Doc{ Item }   	=   "%PI% (%PF%)";
+$Doc{ Project } =   ["PerlUtils","INFR_OBJS"];
+$Doc{ Item }   	=   "PU010C_APP_DEBUG_DEBUG_PM (PERL)";
 $Doc{ desc } = "Functions to generate Debug output from perl scripts";
 
 $Doc{ Description } = "
@@ -26,13 +26,13 @@ $Doc{ Notes } = "
 $Doc{ Author } =  [["Paul Houghton","<paul.houghton\@wcom.com>"]];
 $Doc{ Created } = "05/30/01 06:34";
 
-$Doc{ Last_Mod_By } = "%PO%";
-$Doc{ Last_Mod }    = "%PRT%";
-$Doc{ Ver }	    = "%PIV%";
-$Doc{ Status }	    = "%PS%";
+$Doc{ Last_Mod_By } = "HOUGHTON";
+$Doc{ Last_Mod }    = "30-MAY-2001 09:48:38";
+$Doc{ Ver }	    = "1";
+$Doc{ Status }	    = "INT IMPL";
 
 $Doc{ VersionId }
-  = "%PID%";
+  = "INFR_OBJS:PU010C_APP_DEBUG_DEBUG_PM.A-SRC;1";
 
 $Doc{ VERSION } = "+VERSION+";
 
@@ -188,7 +188,9 @@ sub DebugDumpHash ($$$@) {
 #
 # Revision Log:
 #
-# %PL%
+# Revision 1 (INT IMPL)
+#   Created:  30-MAY-2001 09:49:02 HOUGHTON
+#     Initial Implementation
 #
 
 # Set XEmacs mode
