@@ -73,6 +73,220 @@ sub bold ($$);
 sub synopsys ($);
 sub optString ($$$$);
 sub initialize (@);
+
+sub getUsageText ($$) {
+  my ($self, $level) = (@_);
+
+  my $usageText;
+
+  if( $level <= 1 ) {
+    $usageText .= "\n$$self{ prog } - $$self{ doc }->{ desc }\n\n";
+    $usageText .= "    " . $self->synopsys() ."\n";
+  } elsif ( $level == 2 ) {
+    my $optWidth = 0;
+    my @opts;
+    foreach my $o (@{$$self{ options }} ) {
+      my $optText = $self->optString( $$o[0], $$o[2], $$o[3] );
+      push(@opts,$optText);
+      my $optLen = length( $optText );
+      if( $optLen > $optWidth ) {
+	$optWidth = ( $optLen > 20 ? 20 : $optLen );
+      }
+    }
+
+    $usageText .= "\n$$self{ prog } - $$self{ doc }->{ desc }\n\n";
+    for( my $i = 0; $opts[$i]; ++ $i ) {
+      # print "OPT: $opts[$i] ($optWidth) \n";
+      # print "$$self{ options }[$i][3]\n";
+      my $optDesc = fill( $optWidth + 2,
+			  $optWidth + 2,
+			  $$self{ outwidth },
+			  $$self{ options }[$i][ 4 ] );
+      # print "DESC: $optDesc\n";
+      if( length( $opts[$i] ) > $optWidth ) {
+	$usageText .= " $opts[$i]\n";
+	$usageText .= $optDesc;
+      } else {
+	substr( $optDesc, 1, length( $opts[$i] ) ) = $opts[$i];
+	$usageText .= "$optDesc";
+      }
+    }
+  } elsif( $level == 3 ) {
+    my $optWidth = 0;
+    my @opts;
+    foreach my $o (@{$$self{ options }} ) {
+      my $optText = $self->optString( $$o[0], $$o[2], $$o[3] );
+      push(@opts,$optText);
+      my $optLen = length( $optText );
+      if( $optLen > $optWidth ) {
+	$optWidth = ( $optLen > 20 ? 20 : $optLen );
+      }
+    }
+
+    $usageText .=
+      "\n$$self{ prog } " .
+      "- $$self{ doc }->{ Version } " .
+      "- $$self{ doc }->{ Last_Mod }\n\n";
+
+    $usageText .= fill( 1, 1, $$self{ outwidth },
+			$$self{ doc }->{ Description } ) ."\n";
+
+    for( my $i = 0; $opts[$i]; ++ $i ) {
+      my $optDesc = fill( $optWidth + 2,
+			  $optWidth + 2,
+			  $$self{ outwidth },
+			  $$self{ options }[ $i ][ 5 ] );
+      if( length( $opts[$i] ) > $optWidth ) {
+	$usageText .= " $opts[$i]\n";
+	$usageText .= $optDesc;
+      } else {
+	if( $optDesc && length( $optDesc ) > length( $opts[$i] ) ) {
+	  substr( $optDesc, 1, length( $opts[$i] ) ) = $opts[$i];
+	  $usageText .= "$optDesc";
+	} else {
+	  $usageText .= " ".$opts[$i].( $optDesc ? " ".$optDesc : "" );
+	}
+      }
+
+    }
+  } else {
+    my $optWidth = 0;
+    my @opts;
+    my @envVars;
+    foreach my $o (@{$$self{ options }} ) {
+      my $optText = $self->optString( $$o[0], $$o[2], $$o[3] );
+      push(@opts,$optText);
+      my $optLen = length( $optText );
+      if( $optLen > $optWidth ) {
+	$optWidth = ( $optLen > 20 ? 20 : $optLen );
+      }
+
+      if( defined( $$o[6] ) ) {
+	if( ref( $$o[6] ) eq "ARRAY" ) {
+	  # print "ENV is ARRAY\n";
+	  my $env;
+	  foreach $env (@{$$o[6]}) {
+	    push( @envVars, [ $env, "Used for option `$optText'" ] );
+	  }
+	} else {
+	  push( @envVars, [ $$o[6], "Used for option `$optText'" ] );
+	}
+      }
+    }
+    $usageText .= "
+" . $self->bold( "NAME" ) ."
+
+    $$self{ prog } - $$self{ doc }->{ desc }
+
+" . $self->bold( "SYNOPSYS" ) . "
+
+";
+    $usageText .= "    " . $self->synopsys() . "\n\n";
+    $usageText .= $self->bold( "DESCRIPTION" )."\n\n";
+    $usageText .= fill( 4, 4, $$self{ outwidth },
+			$$self{ doc }->{ Description } );
+
+    $usageText .= $self->bold( "OPTIONS" )."\n\n";
+
+    for( my $i = 0; $opts[$i]; ++ $i ) {
+      my $optDesc = fill( $optWidth + 6,
+			  $optWidth + 6,
+			  $$self{ outwidth },
+			  $$self{ options }[ $i ][ 5 ] );
+
+      if( length( $opts[$i] ) > $optWidth ) {
+	$usageText .= "    $opts[$i]\n";
+	$usageText .= $optDesc;
+      } else {
+	substr( $optDesc, 4, length( $opts[$i] ) ) = $opts[$i];
+	$usageText .= "$optDesc";
+      }
+    }
+
+    if( defined( $$self{ doc }->{ "EXTRA_SECTIONS" } ) ) {
+      foreach my $sect (@{$$self{ doc }->{ "EXTRA_SECTIONS" }}) {
+	$usageText .= $self->bold( "$sect" )."\n\n";
+	$usageText .= fill( 4, 4, $$self{ outwidth },
+			    $$self{ doc }->{ $sect } )."\n\n";
+      }
+    }
+
+    if( defined( $$self{ env } ) || @envVars ) {
+      $usageText .= $self->bold( "ENVIRONMENT" )."\n\n";
+      my $e;
+      my $envWidth = 0;
+      foreach $e (@envVars) {
+	my $envLen = length( $$e[0] );
+	if( $envLen > $envWidth ) {
+	  $envWidth = ($envLen > 20 ? 20 : $envLen );
+	}
+      }
+      foreach my $e (@{$$self{ env }}) {
+	my $envLen = length( $$e[0] );
+	print "ENV: $e\n";
+	push( @envVars, $e );
+	if( $envLen > $envWidth ) {
+	  $envWidth = ($envLen > 20 ? 20 : $envLen );
+	}
+      }
+      print "ENV W: $envWidth\n";
+      my $env;
+      foreach $env (@envVars) {
+	my $envDesc = fill( $envWidth + 6,
+			    $envWidth + 6,
+			    $$self{ outwidth },
+			    $$env[ 1 ] );
+	if( length( $$env[0] ) > $envWidth ) {
+	  $usageText .= "    $$env[0]\n";
+	  $usageText .= $envDesc;
+	} else {
+	  substr( $envDesc, 4, length( $$env[0] )) = $$env[0];
+	  $usageText .= $envDesc;
+	}
+      }
+    }
+
+    if( defined( $$self{ doc }->{ "See Also" } ) ) {
+      $usageText .= $self->bold( "SEE ALSO" )."\n\n";
+      my $see;
+      my $seeText = "";
+      foreach $see (@{$$self{ doc }->{ "See Also" }}) {
+	$seeText .= "$$see[0]($$see[1]) ";
+      }
+      $usageText .= fill( 4, 4, $$self{ outwidth }, $seeText );
+    }
+	
+    if( defined( $$self{ doc }->{ "Files" } ) ) {
+      $usageText .= $self->bold( "FILES" )."\n\n";
+      my $f;
+      foreach $f (@{$$self{ doc }->{ Files }}) {
+	$usageText .= "    $f\n";
+      }
+      $usageText .= "\n";
+    }
+
+    if( defined( $$self{ doc }->{ VERSION } ) ) {
+      $usageText .= $self->bold( "VERSION" )."\n\n";
+      $usageText .= "    $$self{ doc }->{ VERSION }";
+
+      if( defined( $$self{ doc }->{ Last_Mod } ) ) {
+	$usageText .= " - $$self{ doc }->{ Last_Mod }\n\n";
+      } else {
+	$usageText .= "\n\n";
+      }
+    }
+
+    if( defined( $$self{ doc }->{ Author } ) ) {
+      $usageText .= $self->bold( "AUTHOR" )."\n\n";
+      foreach $a (@{$$self{ doc }->{ Author }} ) {
+	$usageText .= "    " . $$a[0] . " - " . $$a[1] . "\n";
+      }
+      $usageText .= "\n\n";
+    }
+  }
+  return( $usageText );
+}
+
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
 1;
@@ -249,214 +463,6 @@ sub bold ($$) {
   return( $text );
 }
 
-sub getUsageText ($$) {
-  my ($self, $level) = (@_);
-
-  my $usageText;
-
-  if( $level <= 1 ) {
-    $usageText .= "\n$$self{ prog } - $$self{ doc }->{ desc }\n\n";
-    $usageText .= "    " . $self->synopsys() ."\n";
-  } elsif ( $level == 2 ) {
-    my $optWidth = 0;
-    my @opts;
-    foreach $o (@{$$self{ options }} ) {
-      my $optText = $self->optString( $$o[0], $$o[2], $$o[3] );
-      push(@opts,$optText);
-      my $optLen = length( $optText );
-      if( $optLen > $optWidth ) {
-	$optWidth = ( $optLen > 20 ? 20 : $optLen );
-      }
-    }
-
-    $usageText .= "\n$$self{ prog } - $$self{ doc }->{ desc }\n\n";
-    for( $i = 0; $opts[$i]; ++ $i ) {
-      # print "OPT: $opts[$i] ($optWidth) \n";
-      # print "$$self{ options }[$i][3]\n";
-      my $optDesc = fill( $optWidth + 2,
-			  $optWidth + 2,
-			  $$self{ outwidth },
-			  $$self{ options }[$i][ 4 ] );
-      # print "DESC: $optDesc\n";
-      if( length( $opts[$i] ) > $optWidth ) {
-	$usageText .= " $opts[$i]\n";
-	$usageText .= $optDesc;
-      } else {
-	substr( $optDesc, 1, length( $opts[$i] ) ) = $opts[$i];
-	$usageText .= "$optDesc";
-      }
-    }
-  } elsif( $level == 3 ) {
-    my $optWidth = 0;
-    my @opts;
-    foreach $o (@{$$self{ options }} ) {
-      my $optText = $self->optString( $$o[0], $$o[2], $$o[3] );
-      push(@opts,$optText);
-      my $optLen = length( $optText );
-      if( $optLen > $optWidth ) {
-	$optWidth = ( $optLen > 20 ? 20 : $optLen );
-      }
-    }
-
-    $usageText .=
-      "\n$$self{ prog } " .
-      "- $$self{ doc }->{ Version } " .
-      "- $$self{ doc }->{ Last_Mod }\n\n";
-
-    $usageText .= fill( 1, 1, $$self{ outwidth },
-			$$self{ doc }->{ Description } ) ."\n";
-
-    for( $i = 0; $opts[$i]; ++ $i ) {
-      my $optDesc = fill( $optWidth + 2,
-			  $optWidth + 2,
-			  $$self{ outwidth },
-			  $$self{ options }[ $i ][ 5 ] );
-      if( length( $opts[$i] ) > $optWidth ) {
-	$usageText .= " $opts[$i]\n";
-	$usageText .= $optDesc;
-      } else {
-	substr( $optDesc, 1, length( $opts[$i] ) ) = $opts[$i];
-	$usageText .= "$optDesc";
-      }
-
-    }
-  } else {
-    my $optWidth = 0;
-    my @opts;
-    my @envVars;
-    foreach $o (@{$$self{ options }} ) {
-      my $optText = $self->optString( $$o[0], $$o[2], $$o[3] );
-      push(@opts,$optText);
-      my $optLen = length( $optText );
-      if( $optLen > $optWidth ) {
-	$optWidth = ( $optLen > 20 ? 20 : $optLen );
-      }
-
-      if( defined( $$o[6] ) ) {
-	if( ref( $$o[6] ) eq "ARRAY" ) {
-	  # print "ENV is ARRAY\n";
-	  my $env;
-	  foreach $env (@{$$o[6]}) {
-	    push( @envVars, [ $env, "Used for option `$optText'" ] );
-	  }
-	} else {
-	  push( @envVars, [ $$o[6], "Used for option `$optText'" ] );
-	}
-      }
-    }
-    $usageText .= "
-" . $self->bold( "NAME" ) ."
-
-    $$self{ prog } - $$self{ doc }->{ desc }
-
-" . $self->bold( "SYNOPSYS" ) . "
-
-";
-    $usageText .= "    " . $self->synopsys() . "\n\n";
-    $usageText .= $self->bold( "DESCRIPTION" )."\n\n";
-    $usageText .= fill( 4, 4, $$self{ outwidth },
-			$$self{ doc }->{ Description } );
-
-    $usageText .= $self->bold( "OPTIONS" )."\n\n";
-
-    for( $i = 0; $opts[$i]; ++ $i ) {
-      my $optDesc = fill( $optWidth + 6,
-			  $optWidth + 6,
-			  $$self{ outwidth },
-			  $$self{ options }[ $i ][ 5 ] );
-
-      if( length( $opts[$i] ) > $optWidth ) {
-	$usageText .= "    $opts[$i]\n";
-	$usageText .= $optDesc;
-      } else {
-	substr( $optDesc, 4, length( $opts[$i] ) ) = $opts[$i];
-	$usageText .= "$optDesc";
-      }
-    }
-
-    if( defined( $$self{ doc }->{ "EXTRA_SECTIONS" } ) ) {
-      foreach $sect (@{$$self{ doc }->{ "EXTRA_SECTIONS" }}) {
-	$usageText .= $self->bold( "$sect" )."\n\n";
-	$usageText .= fill( 4, 4, $$self{ outwidth },
-			    $$self{ doc }->{ $sect } )."\n\n";
-      }
-    }
-
-    if( defined( $$self{ env } ) || @envVars ) {
-      $usageText .= $self->bold( "ENVIRONMENT" )."\n\n";
-      my $e;
-      my $envWidth = 0;
-      foreach $e (@envVars) {
-	my $envLen = length( $$e[0] );
-	if( $envLen > $envWidth ) {
-	  $envWidth = ($envLen > 20 ? 20 : $envLen );
-	}
-      }
-      foreach $e (@{$$self{ env }}) {
-	my $envLen = length( $$e[0] );
-	print "ENV: $e[0]\n";
-	push( @envVars, $e );
-	if( $envLen > $envWidth ) {
-	  $envWidth = ($envLen > 20 ? 20 : $envLen );
-	}
-      }
-      print "ENV W: $envWidth\n";
-      my $env;
-      foreach $env (@envVars) {
-	my $envDesc = fill( $envWidth + 6,
-			    $envWidth + 6,
-			    $$self{ outwidth },
-			    $$env[ 1 ] );
-	if( length( $$env[0] ) > $envWidth ) {
-	  $usageText .= "    $$env[0]\n";
-	  $usageText .= $envDesc;
-	} else {
-	  substr( $envDesc, 4, length( $$env[0] )) = $$env[0];
-	  $usageText .= $envDesc;
-	}
-      }
-    }
-
-    if( defined( $$self{ doc }->{ "See Also" } ) ) {
-      $usageText .= $self->bold( "SEE ALSO" )."\n\n";
-      my $see;
-      my $seeText = "";
-      foreach $see (@{$$self{ doc }->{ "See Also" }}) {
-	$seeText .= "$$see[0]($$see[1]) ";
-      }
-      $usageText .= fill( 4, 4, $$self{ outwidth }, $seeText );
-    }
-	
-    if( defined( $$self{ doc }->{ "Files" } ) ) {
-      $usageText .= $self->bold( "FILES" )."\n\n";
-      my $f;
-      foreach $f (@{$$self{ doc }->{ Files }}) {
-	$usageText .= "    $f\n";
-      }
-      $usageText .= "\n";
-    }
-
-    if( defined( $$self{ doc }->{ VERSION } ) ) {
-      $usageText .= $self->bold( "VERSION" )."\n\n";
-      $usageText .= "    $$self{ doc }->{ VERSION }";
-
-      if( defined( $$self{ doc }->{ Last_Mod } ) ) {
-	$usageText .= " - $$self{ doc }->{ Last_Mod }\n\n";
-      } else {
-	$usageText .= "\n\n";
-      }
-    }
-
-    if( defined( $$self{ doc }->{ Author } ) ) {
-      $usageText .= $self->bold( "AUTHOR" )."\n\n";
-      foreach $a (@{$$self{ doc }->{ Author }} ) {
-	$usageText .= "    " . $$a[0] . " - " . $$a[1] . "\n";
-      }
-      $usageText .= "\n\n";
-    }
-  }
-  return( $usageText );
-}
 
 sub usage ( $$$ ) {
   my ($self, $level, $usePager) = (@_);
