@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="US-ASCII"?>
-<!DOCTYPE contents SYSTEM "../dtd/common/DocTools/contents.dtd" [
- <!ENTITY % TOP.DIR "..">
- <!ENTITY % projectEntity SYSTEM "../dtd/project.ent">
+<!DOCTYPE contents
+	PUBLIC "-//DocTools//DTD Table of Contents//EN" 
+	       "dtd/DocTools/contents.dtd" [
+
+ <!ENTITY TOP.DIR "..">
+ <!ENTITY % projectEntity
+	PUBLIC "-//Project//ENTITY Project Variables//EN"
+	       "../dtd/project.ent">
  %projectEntity;
 ]>
+<?xml-stylesheet
+    href="xsl/DocTools/html/contents.xsl"
+    type="text/xsl" ?>
+
 <contents>
   <dochead>
     <title>
@@ -42,18 +51,15 @@
   
   <toc>
     <item>
-      <doc doc="Install" usedesc="yes">
-	Standalone Installation Instructions
-      </doc>
+      <doc doc="StandaloneInstall">Standalone Intallation</doc>
     </item>
     <item>
-      <doc doc="PrjInstall" usedesc="yes">
-	Project Installation Instructions
-      </doc>
+      <doc doc="SupportInstall">Support Tool Installation</doc>
     </item>
   </toc>
 
 </contents>
+
 
 <!-- Revision Log:
 

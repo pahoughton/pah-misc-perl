@@ -95,6 +95,8 @@ PHONY_TARGETS		= $(HELP_TARGETS)
 
 # *** DOC FILES ***
 
+SUPPORT_MAKEFILE_TXT	= Support.Makefile.txt
+
 SUBDIRS		=
 
 XML_MAN_1_SOURCES	=
@@ -108,9 +110,6 @@ XML_HTML_SOURCES	=	\
 	$(XML_MAN_3_SOURCES)	\
 	$(XML_MAN_5_SOURCES)	\
 	00-Readme.xml		\
-	Install.xml		\
-	Prerequisits.xml	\
-	PrjInstall.xml		\
 
 POD_MAN_1_SOURCES	=
 

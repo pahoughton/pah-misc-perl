@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="US-ASCII"?>
-<!DOCTYPE contents SYSTEM "dtd/common/DocTools/contents.dtd" [
- <!ENTITY % TOP.DIR ".">
- <!ENTITY % projectEntity SYSTEM "dtd/project.ent">
+
+<!DOCTYPE rel-notes
+	PUBLIC "-//DocTools//DTD Release Notes//EN" 
+	       "dtd/DocTools/rel-notes.dtd" [
+
+ <!ENTITY TOP.DIR ".">
+ <!ENTITY % projectEntity
+	PUBLIC "-//Project//ENTITY Project Variables//EN"
+	       "./dtd/project.ent">
  %projectEntity;
 ]>
+
+<?xml-stylesheet
+    href="xsl/DocTools/html/rel-notes.xsl"
+    type="text/xsl" ?>
+
 <rel-notes>
   <dochead>
     <title>

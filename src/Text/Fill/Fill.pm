@@ -1,53 +1,34 @@
+#
+# File:	    Fill.pm
+# Project:  PerlUtils %PP%
+# Item:	    %PI% (%PF%)
+# Desc:
+#
+#   Source for Text::Fill perl module.
+#
+# Notes:
+#
+#   See pod below for documentation
+#
+# Created:  02/25/01 00:19
+# Author:   Paul Houghton <paul.houghton@wcom.com>
+#
+# Revision Information (See Revision Log below for more info)
+#
+#   Last Mod By:    %PO%
+#   Last Mod:	    %PRT%
+#   Version:	    %PIV%
+#   Status:	    %PS%
+#
+# %PID%
+#
+
+
 package Text::Fill;
 require 5.6.0;
 use strict;
 use warnings;
-our %Doc;
 our $VERSION = "1.01";
-#
-$Doc{ Name } =	    "Text::Fill";
-$Doc{ File } =	    "Fill.pm";
-$Doc{ Project } =   ["PerlUtils", "(%PP%)"];
-$Doc{ Item } =	    "%PI% (%PF%)";
-
-$Doc{ desc } = "Fill and wrap mutilple paragraphs";
-
-$Doc{ Description } = "
-
-    The fill function reformats text multiple text paragraphs according
-    to the arguments given. Eah paragraph is separated by a pair of
-    newlines with only spaces between them (i.e. \\n\\s*\\n). The
-    text of each paragraph will be indented the number of spaces
-    specifed by the `\$first', and `\$rest' options. Each line will
-    be broken up so that it is no longer than `\$width'.
-
-    Any paragraph in a single call that is indented more that the
-    rest of the paragraphs passed is not wrapped. So, if you had
-    a sequence of descriptive text paragraphs then an indented
-    piece of example code, the exaple code would be indented with
-    `\$first' and the abount of original indent, but it's lines
-    would not be wrapped or filled.
-
-    Any words that are to long to be wrapped will start on a
-    new line, but otherwise be untouched.
-
-";
-$Doc{ Notes } = "
-
-   For the rest of this Package's documentation,
-   see `Detailed Documentation' below.
-";
-$Doc{ Author } =  [["Paul Houghton","<paul.houghton\@wcom.com>"]];
-$Doc{ Created } = "02/25/01 00:19";
-
-$Doc{ Last_Mod_By } = "%PO%";
-$Doc{ Last_Mod }    = "%PRT%";
-$Doc{ Ver }	    = "%PIV%";
-$Doc{ Status }	    = "%PS%";
-
-$Doc{ VersionId }
-  = "%PID%";
-
 require Exporter;
 use AutoLoader qw(AUTOLOAD);
 
@@ -86,6 +67,124 @@ __END__
 # Below is stub documentation for your module. You better edit it!
 
 # POD HERE
+
+=head1 NAME
+
+Test::Fill - Fill and wrap mutilple paragraphs
+
+=head1 SYNOPSIS
+
+    Use::Text::Fill( fill );
+
+    my $text = fill( 4, 4, 75, @paragraphs );
+    print $text;
+
+=head1 DESCRIPTION
+
+    The fill function reformats text multiple text paragraphs according
+    to the arguments given. Eah paragraph is separated by a pair of
+    newlines with only spaces between them (i.e. \n\s*\n). The
+    text of each paragraph will be indented the number of spaces
+    specifed by the `$first', and `$rest' options. Each line will
+    be broken up so that it is no longer than `$width'.
+
+    Any paragraph in a single call that is indented more that the
+    rest of the paragraphs passed is not wrapped. So, if you had
+    a sequence of descriptive text paragraphs then an indented
+    piece of example code, the exaple code would be indented with
+    `$first' and the abount of original indent, but it's lines
+    would not be wrapped or filled.
+
+    Any words that are to long to be wrapped will start on a
+    new line, but otherwise be untouched.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item Text::fill( $first, $rest, $width, @paragraphs )
+
+=over 4
+
+=item Aguments:
+
+=over 4
+
+=item first (number)
+
+number of characters to indent the first line of each paragraph.
+
+=item rest (number)
+
+number of characters to indent the rest of the of each paragraph.
+
+=item width (number)
+
+the maximum width of each line including the indent.
+
+=item paragraphs (array of string)
+
+The text of the paragraphs. The array is is is first `join'ed with a
+single space, so the seperate elements in it has no significance.
+
+=back
+
+=item Returns:
+
+the formated paragraphs are returned as a single scalar text string.
+
+=back
+
+=back
+
+=head1 EXAMPLE
+
+Here is an example of the effect of the fill function:
+
+    $paras = "
+Here are a couple of paragraphs to fill and wrap with
+the Text::Fill::fill() function.
+each paragraph is separated by a '\n\s*\n' sequence and special
+code sections that are indented as compared to the
+rest of the text are not wrapped. Here is a non wrapped snippet:
+
+    my $var;
+    foreach $var (split(/\s/,"these are words to use" )) {
+      print "$var";
+    }";
+
+
+    use Text::Fill;
+    my $text = fill( 8, 8, 75, $paras );
+    print $text;
+
+This is what you would get output:
+
+        Here are a couple of paragraphs to fill and wrap with the
+        Text::Fill::fill() function. each paragraph is separated by a
+        '\n\s*\n' sequence and special code sections that are indented as
+        compared to the rest of the text are not wrapped. Here is a non
+        wrapped snippet:
+
+            my $var;
+            foreach $var (split(/s/,"these are words to use" )) {
+              print "$var";
+            }
+
+=head1 AUTHORS
+
+%PRT%
+
+Paul Houghton <paul.houghton@wcom.com>
+
+=head1 SEE ALSO
+
+L<Text::Tabs>
+L<Text::Wrap>
+
+perl(1).
+
+=cut
 
 use Text::Tabs qw(expand unexpand);
 use App::Debug;
@@ -192,68 +291,6 @@ sub fill ( $$$@ ) {
   return( $outText );
 }
 
-$Doc{ Functions } =
-  [
-   [ [ "string",	"the formated paragraphs are returned as a"
-			." single scalar text string." ],
-     [ "fill",		"fill and wrap paragraphs (see 'DESCRIPTION')."],
-     [ "num","\$first",	"number of characters to indent the first line"
-		       ." of each paragraph." ],
-     [ "num","\$rest",	"number of characters to indent the rest of the"
-			." lines in each paragraph." ],
-     [ "num","\$width",	"the maximum width of each line including the"
-			." indent." ],
-     [ "\@", "\$paras",	"The text of the paragraphs. The array is is"
-			." is first `join'ed with a single space, so"
-			." the seperate elements in it has no"
-			." significance." ]
-   ]
-  ];
-
-$Doc{ Synopsys } = "
-
-    Use::Text::Fill( fill );
-
-    my \$text = fill( 4, 4, 75, \@paragraphs );
-    print \$text;
-";
-
-$Doc{ "Example" } = "
-
-Here is an example of the effect of the fill function:
-
-    \$paras = \"
-Here are a couple of paragraphs to fill and wrap with
-the Text::Fill::fill() function.
-each paragraph is separated by a '\\n\\s*\\n' sequence and special
-code sections that are indented as compared to the
-rest of the text are not wrapped. Here is a non wrapped snippet:
-
-    my \$var;
-    foreach \$var (split(/\\s/,\"these are words to use\" )) {
-      print \"\$var\";
-    }\";
-
-
-    use Text::Fill;
-    my \$text = fill( 8, 8, 75, \$paras );
-    print \$text;
-
-This is what you would get output:
-
-        Here are a couple of paragraphs to fill and wrap with the
-        Text::Fill::fill() function. each paragraph is separated by a
-        '\\n\\s*\\n' sequence and special code sections that are indented as
-        compared to the rest of the text are not wrapped. Here is a non
-        wrapped snippet:
-
-            my \$var;
-            foreach \$var (split(/s/,\"these are words to use\" )) {
-              print \"\$var\";
-            }
-";
-
-$Doc{ "See Also" } = [ "Text::Tabs", "Text::Wrap" ];
 
 #
 # Revision Log:
