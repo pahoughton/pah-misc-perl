@@ -1551,8 +1551,11 @@ sub ParseComment ($$) {
 	  }
 	}
 
+      } elsif( $prevSection =~ /example/i ) {
+	$$info{ example } = $text;
+      } else {
+	Debug( 0, "UNPROCESSED SECTION: $prevSection\n" );
       }
-      # next section
     } else {
       # Debug( 1, "SAME SECTION: $prevSection\n" );
     }
