@@ -18,18 +18,25 @@
 # $Id$
 #
 # $Log$
+# Revision 1.2  1996/11/14 23:16:06  houghton
+# Minor cleanup and added a usage help mesg.
+#
 # Revision 1.1  1995/11/16 14:35:20  houghton
 # Initial Version.
 #
 # 
 
+if( $#ARGV < 0 )
+{
+  print "Usage: SybTable tablename | list datebase server user password\n";
+  exit;
+}
 
 $database = $ENV{"SYBDB"};
-
 $server = $ENV{"DSQUERY"};
+$user   = $ENV{"SYBUSER"};
+$password =  $ENV{"SYBPASS"};
 
-$user   = "houghton";
-$password = "cmore";
 if( $ARGV[1] )
 {
   $database = $ARGV[1];
