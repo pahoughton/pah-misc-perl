@@ -40,6 +40,7 @@ TERM_SIZE_target	= $(perlmods_lib_os_dir)/Term/Size.pm
 $(TERM_SIZE_target): $(tools_archive_dir)/$(TERM_SIZE_tar)
 	$(hide) echo -n "+ Installing $(TERM_SIZE_NAME) ..."	\
 	&& cd $(TERM_SIZE_EXTRACT_DIR)				\
+	&& rm -rf $(TERM_SIZE_build_dir)			\
 	&& zcat $< | tar xf -					\
 	&& cd $(TERM_SIZE_build_dir)				\
 	&& perl Makefile.PL $(setup_output)			\
