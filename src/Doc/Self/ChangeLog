@@ -1,0 +1,5 @@
+2001-02-25  Paul Houghton  <paul.houghton@wcom.com>
+
+	* Self.pm: original version; created by h2xs 1.20 with options
+		-Xn Doc::Self
+
