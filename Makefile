@@ -35,6 +35,8 @@ config_dir  	= $(PRJ_TOPDIR)/src/config
 include $(config_dir)/00-Makefile.cfg
 -include Make/make.cfg.$(make_cfg_ver)
 
+# cvs_tag		=
+
 SUBDIRS		= docs src test
 
 TARGETS		= $(standard_targets) dist dist_html
@@ -55,8 +57,8 @@ install install_all:
 	$(call make_subdirs,$@,src docs,$($(@)_exports))
 
 
-dist:
-	$(call make_dist_from_dim,infr_objs,mcmain,$(PROJECT_DIR))
+dist_source:
+	$(call make_dist_from_cvs,$(cvs_tag),$(PROJECT_DIR))
 
 dist_html:
 	$(call make_subdirs,$@,docs,$($(@)_exports) $(exports))
@@ -76,6 +78,11 @@ dist_html:
 #   force	    If this is not empty, force the rebuild of all
 #		    targets even if none of the dependencies are out
 #		    of date.
+#
+#   cvs_tag	    Use to specify the cvs TAG value for dist_sources.
+#		    This value must be specified on the command line
+#		    when building the 'dist_sources' target. For
+#		    exammple: make dist_sources cvs_tag=MY_PRJ_1_01
 #
 # Help variables
 #
