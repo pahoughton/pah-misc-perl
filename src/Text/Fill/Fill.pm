@@ -51,8 +51,6 @@ our @EXPORT = qw(
 	
 );
 
-$Doc{ "VERSION" } = $VERSION;
-
 # Preloaded methods go here.
 
 our $debug = 0;
@@ -162,7 +160,7 @@ This is what you would get output:
 
         Here are a couple of paragraphs to fill and wrap with the
         Text::Fill::fill() function. each paragraph is separated by a
-        '\n\s*\n' sequence and special code sections that are indented as
+        `\n\s*\n' sequence and special code sections that are indented as
         compared to the rest of the text are not wrapped. Here is a non
         wrapped snippet:
 
