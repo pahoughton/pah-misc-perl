@@ -18,6 +18,9 @@
 # $Id$
 #
 # $Log$
+# Revision 1.5  1997/05/12 11:15:08  houghton
+# Rework taskOrder so I don't have to specify an order number.
+#
 # Revision 1.4  1997/05/12 10:58:14  houghton
 # Added Dist development.
 #
@@ -37,34 +40,32 @@ $DEBUG = 0;
 
 $LogFile = "$ENV{HOME}/pers/work/status/log";
 
-
-%taskOrder = ( "WILBAN",	"01",
-	      "ANISERV",	"02",
-#	      "WILPAK",		"02",
-	      "NAMESRV",	"03",
-	      "CF",		"04",
-	      "CORE",		"05",
-	      "TOOLS",		"06",
-	      "RATING",		"07",
-	      "CISDESIGN",	"08",
-	      "DISTRIB_DB",	"09",
-	      "DIST",		"10"
-	      "SICK",		"11",
-	      "ST_DIS",		"12",
-	      "VAC",		"13",
-	      "HOLY",		"14",
-	      "FLOAT",		"15",
-	      "FAM_ILL",	"16",
-	      "BEREAV",		"17",
-	      "INJURY",		"18",
-	      "MIL_LEV",	"19",
-	      "JURY",		"20",
-	      "NP_OVER",	"21",
-	      "INT_MEET",	"22",
-	      "TRAIN",		"23",
-	      "COMP",		"24",
-	      "OTHER",		"25"
-	     );
+@taskOrderArray = ("WILBAN",
+		   "ANISERV",
+		   "WILPAK",
+		   "NAMESRV",
+		   "CF",
+		   "CORE",
+		   "TOOLS",
+		   "RATING",
+		   "CISDESIGN",
+		   "DISTRIB_DB",
+		   "DIST",
+		   "SICK",
+		   "ST_DIS",
+		   "VAC",
+		   "HOLY",
+		   "FLOAT",
+		   "FAM_ILL",
+		   "BEREAV",
+		   "INJURY",
+		   "MIL_LEV",
+		   "JURY",
+		   "NP_OVER",
+		   "INT_MEET",
+		   "TRAIN",
+		   "COMP",
+		   "OTHER" );
 
 $doubeLine = 07;
 
@@ -78,7 +79,7 @@ $doubeLine = 07;
 	     "RATING",	"T98033-015\nRating",
 	     "CISDESIGN",   "T04071-070\nPH I-Dev",
 	     "DISTRIB_DB",  "T04071-050\nDBSS Interface",
-	     "DIST",	    "T04071-060\nDistributor Development"
+	     "DIST",	    "T04071-060\nDist Development",
 	     "SICK",	"Sick",
 	     "ST_DIS",	"Short Trm Dis",
 	     "VAC",	"Vacation",
@@ -128,7 +129,7 @@ sub GenTimeSheet
 
   foreach $k (sort( keys( %orderTask ) ) )
     {
-      if( $k > 9 )
+      if( $k >= $taskOrder{"SICK"} )
 	{
 	  printf("\n\n%-19s",$taskList{ $orderTask{$k} } );
 	}
@@ -191,6 +192,16 @@ sub GenTimeSheet
   
   
 }
+
+#
+# Init Task order
+#
+
+for( $t = 0; $t < $#taskOrderArray; ++ $t )
+  {
+    $taskOrder{ $taskOrderArray[$t] } = $t;
+  }
+
 
 open( LOG, "< $LogFile" ) || die "open $LogFile: $!";
 
