@@ -18,6 +18,9 @@
 # $Id$
 #
 # $Log$
+# Revision 1.2  1996/10/26 10:34:45  houghton
+# on-going development and improvements.
+#
 # Revision 1.1  1996/10/02 12:07:42  houghton
 # *** empty log message ***
 #
@@ -45,48 +48,50 @@ sub PrintMeth
     
     if( $name )
       {
-	print "$name( ";
-      }
+	print "$name(";
 
-    if( length( $args ) < 40 )
-      {
-	if( ! $args )
+	if( length( $args ) < 40 )
 	  {
-	    $args = "void";
+	    if( ! $args )
+	      {
+		$args = "void";
+	      }
+	    print "$args) $methConst\n";
 	  }
-	print "$args ) $methConst\n";
-      }
-    else
-      {
-	print "\n.RS 2\n";
-
-	my $argOut = "";
+	else
+	  {
+	    print "\n.RS 2\n";
+	    
+	    my $argOut = "";
 	
-	foreach $a (split(/,/,$args))
-	  {
-	    $argType = "";
-	    $argName = "";
-	    if( $a =~ /=/ )
+	    foreach $a (split(/,/,$args))
 	      {
-		$a =~ /^[ \t]*(.*)[ \t]([A-Za-z_]+ += .+)[ \t]*$/;
-		$argType = $1;
-		$argName = $2;
+		$argType = "";
+		$argName = "";
+		if( $a =~ /=/ )
+		  {
+		    $a =~ /^[ \t]*(.*)[ \t]([A-Za-z_]+ += .+)[ \t]*$/;
+		    $argType = $1;
+		    $argName = $2;
+		  }
+		else
+		  {
+		    $a =~ /^[ \t]*(.*)[ \t]([A-Za-z_]+)[ \t]*$/;
+		    $argType = $1;
+		    $argName = $2;
+		  }
+		$argName =~ s/\\/\\\\/g;
+		$argOut .= ".TP 20\n$argType\n$argName,\n";
 	      }
-	    else
-	      {
-		$a =~ /^[ \t]*(.*)[ \t]([A-Za-z_]+)[ \t]*$/;
-		$argType = $1;
-		$argName = $2;
-	      }
-	    $argName =~ s/\\/\\\\/g;
-	    $argOut .= ".TP 20\n$argType\n$argName,\n";
+	    chop $argOut;
+	    chop $argOut;
+	    
+	    print "$argOut ) $methConst\n.RE\n";
 	  }
-	chop $argOut;
-	chop $argOut;
-
-	print "$argOut ) $methConst\n.RE\n";
       }
-    print ".PD\n.PP\n.RS\n$desc\n.RE\n.PP\n";
+    print ".PD\n.PP\n.RS\n";    
+    print "$desc\n.";
+    print "RE\n.PP\n";
   }
   
 $SourceFile = $ARGV[0];
@@ -94,7 +99,7 @@ $LibName = $ARGV[1];
 
 if( ! $ARGV[1] )
 {
-  $LibName = "Clue";
+  $PrjName = "Clue";
 }
 
 if( open( HDR, "<$SourceFile" ) != 1 )
@@ -109,6 +114,12 @@ while(<HDR>)
       next;
     }
 
+  if( /(\$ *Id: *[^\$]+\$)/ )
+     {
+#       print STDERR "$1\n";
+       $VersionTag = $1;
+     }
+     
   if( /^\/\/ +([A-Z][A-Za-z ]+[A-Za-z]):[ \t]*(.*)/ )
     {
       $sect = $1;
@@ -130,8 +141,25 @@ while(<HDR>)
 $ClassName = "/$SourceFile";
 $ClassName =~ s@.*/([^/]+)\.hh@\1@;
 
-print ".TH $ClassName 3 $LibName\n";
+if( $SectionText{ "Project" } )
+  {
+    $PrjName = $SectionText{ "Project" };
+    $PrjName =~  s/^\/\///mg;
+    $PrjName =~  s/^[ \t]*//;
+    $PrjName =~  s/[ \t]*$//;
+  }
+
+if( $VersionTag =~ /(\d\d\d\d)\/(\d\d*)\/(\d\d*)/ )
+{
+  $Date = "$2/$3/$1";
+}
+print ".TH $ClassName 3 \"\" \"$Date\" \"$PrjName\"\n";
 print ".SH NAME\n$ClassName\n";
+
+if( $VersionTag )
+{
+  print ".PP\n$VersionTag\n.PD\n";
+}
 
 print ".SH DESCRIPTION\n";
 
@@ -176,6 +204,7 @@ foreach $ln (split(/\n/,$SectionText{ "Constructors" }))
   else
     {
       $ln =~ s/^[ \t]*//;
+      $ln =~ s/[ \t]+/ /g;
       $methDesc .= "$ln ";
     }
 }
@@ -190,17 +219,18 @@ $SectionText{ "Public Interface" } =~ s/^\/\///mg;
 foreach $ln (split(/\n/,$SectionText{ "Public Interface" }))
 {
   if( $ln =~ /^ {0,5}[ \t]((inline)|(virtual)|(static))\s*$/ )
-     {
-       if( $meth )
-	 {
-	   &PrintMeth( $methType,$methRet,$meth,$methArgs,$methConst,$methDesc);
-	   $methRet = "";
-	   $meth = "";
-	   $methConst = "";
-	 }
-       $methType = $1;
-       next;
-     }
+    {
+      if( $meth )
+	{
+	  &PrintMeth( $methType,$methRet,$meth,$methArgs,$methConst,$methDesc);
+	  $methRet = "";
+	  $meth = "";
+	  $methConst = "";
+	  $methDesc = "";
+	}
+      $methType = $1;
+      next;
+    }
        
   if( $ln =~ /^ {0,5}[ \t]([^ \t][^(]+)$/ )
     {
@@ -210,11 +240,12 @@ foreach $ln (split(/\n/,$SectionText{ "Public Interface" }))
 	  $methType = "";
 	  $meth = "";
 	  $methConst = "";
+	  $methDesc = "";
 	}
       $methRet = $1;
       next;
     }
-      
+   
   if( $ln =~ /^ {0,5}[ \t]([^ \t][^\(]+)[ \t]*\(([^\)]+)(\)*)[ \t]*([const]*)/ )
     {
       if( $meth )
@@ -222,13 +253,14 @@ foreach $ln (split(/\n/,$SectionText{ "Public Interface" }))
 	  &PrintMeth( $methType,$methRet,$meth,$methArgs,$methConst,$methDesc);
 	  $methRet = "";
 	  $methType = "";
+	  $methDesc = "";
 	}
       $meth = $1;
       $methArgs = $2;
       $allArgs = $3;
       $methConst = $4;
       $methDesc = "";
-
+      
       next;
     }
   
@@ -240,16 +272,49 @@ foreach $ln (split(/\n/,$SectionText{ "Public Interface" }))
 	  $allArgs = $2;
 	  $methConst = $3;
 	}
+      next;
     }
-  else
-    {
-      $ln =~ s/^[ \t]*//;
-      $methDesc .= "$ln ";
-    }
+
+  $ln =~ s/^[ \t]*//;
+  $ln =~ s/[ \t]+/ /g;
+  $methDesc .= "$ln ";
+  
 }
 
   &PrintMeth( $methType,$methRet,$meth,$methArgs,$methConst,$methDesc);
 
+  $SectionText{ "Example" } =~ s/^\/\///mg;
+
+  if( $SectionText{ "Example" } )
+    {
+      print ".SH EXAMPLE\n";
+      print ".nf\n";
+      print $SectionText{ "Example" };
+      print ".fn\n";
+    }
+
+  $SectionText{ "See Also" } =~ s/^\/\///mg;
+  $SectionText{ "See Also" } =~ s/^[ \t]*//;
+  $SectionText{ "See Also" } =~ s/[ \t]+/ /g;
+  
+  if( $SectionText{ "See Also" } )
+    {
+      print ".SH SEE ALSO";
+      print $SectionText{ "See Also" };
+      print "\n";
+    }
+
+  $SectionText{ "Files" } =~ s/^\/\///mg;
+  $SectionText{ "Files" } =~ s/^[ \t]*//;
+  $SectionText{ "Files" } =~ s/[ \t]+/ /g;
+
+  if( $SectionText{ "Files" } )
+    {
+      print ".SH FILES";
+      print $SectionText{ "Files" };
+      print "\n";
+    }
+    
   print ".SH AUTHOR\n";
 
   $SectionText{ "Author" } =~ s/^ \t//;
