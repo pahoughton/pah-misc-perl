@@ -18,6 +18,10 @@
 # $Id$
 #
 # $Log$
+# Revision 1.3  1997/02/24 15:27:01  houghton
+# Added aniserver.
+# Changed to open ~/pers/work/status/log.
+#
 # Revision 1.2  1996/10/02 12:07:32  houghton
 # *** empty log message ***
 #
@@ -28,9 +32,12 @@
 
 $DEBUG = 0;
 
+$LogFile = "$ENV{HOME}/pers/work/status/log";
+
 
 %taskOrder = ( "WILBAN",	"01",
-	      "WILPAK",		"02",
+	      "ANISERV",	"02",
+#	      "WILPAK",		"02",
 	      "NAMESRV",	"03",
 	      "CF",		"04",
 	      "CORE",		"05",
@@ -58,6 +65,7 @@ $DEBUG = 0;
 $doubeLine = 07;
 
 %taskList = ("WILBAN",	"T00443-005\nWilband Prod Supp",
+	     "ANISERV",	"T10245    \nANI Server",
 	     "WILPAK",	"T03090-005\nWilPak SNMP Agent",
 	     "NAMESRV", "T03180-005\nCF Name Server",
 	     "CF",	"T92069-005\nCF Prod Support",
@@ -178,7 +186,10 @@ sub GenTimeSheet
   
   
 }
-while(<>)
+
+open( LOG, "< $LogFile" ) || die "open $LogFile: $!";
+
+while(<LOG>)
 {
 #
 # looking for: ^00/00/00 09:30 xxx
