@@ -1,0 +1,32 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+# 
+# Title:            FormatManName.pl
+# 
+# Description:
+# 
+# 	
+# 
+# Notes:
+# 
+# Programmer:	    Paul Houghton - (paul_houghton@wiltel.com)
+# 
+# Start Date:	    5/8/94
+# 
+# Modification History:
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1995/11/16 14:32:55  houghton
+# Initial Version.
+#
+# 
+
+$start = 0;
+
+while(<>)
+  {
+    /^(\w+)\s+\\-\s+(.*)/;
+    print ".TP\n$1\n$2\n";
+  }

@@ -1,0 +1,105 @@
+#!/usr/local/bin/perlsyb
+# -*- perl -*-
+# 
+# Title:            SybTable.pl
+# 
+# Description:
+# 
+# 	
+# 
+# Notes:
+# 
+# Programmer:	    Paul Houghton - (paul_houghton@wiltel.com)
+# 
+# Start Date:	    12/30/94
+# 
+# Modification History:
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1995/11/16 14:35:20  houghton
+# Initial Version.
+#
+# 
+
+
+$database = $ENV{"SYBDB"};
+
+$server = $ENV{"DSQUERY"};
+
+$user   = "houghton";
+$password = "cmore";
+if( $ARGV[1] )
+{
+  $database = $ARGV[1];
+}
+
+if( $ARGV[2] )
+{
+  $server = $ARGV[2];
+}
+
+if( $ARGV[3] )
+{
+  $user = $ARGV[3];
+}
+
+if( $ARGV[4] )
+{
+  $password = $ARGV[4];
+}
+
+&SybDatabase( $database,$user,$password,"SybTable",$server );
+
+
+if( $ARGV[0] eq "list" )
+{
+  &SybSql( "select name from sysobjects where type = 'U' order by name" );
+  
+  while( ($name) = &SybRecord() )
+    {
+      print "$name\n";
+    }
+}
+else
+{
+       
+  $tableInfoSql =
+    "select c.name, t.name, c.length, c.status \n" .
+    "from syscolumns c, systypes t\n" .
+    "where  c.id = object_id('$ARGV[0]') \n" .
+    "and    c.usertype *= t.usertype \n" ;
+  
+  &SybSql( $tableInfoSql );
+  
+  print "\n$server.$database..$ARGV[0]\n";
+  
+  while( @row = &SybRecord() )
+    {
+      $name = $row[0];
+      $type = $row[1];
+      $len  = $row[2];
+      $status = $row[3];
+      
+      if( $type =~ "char" || $type =~ "bin")
+	{
+	  $colType = "$type($len)"; # 
+	}
+      else
+	{
+	  $colType = $type;
+	}
+      
+      if( $status & 8 )
+	{
+	  $isNull = "null";
+	}
+      else
+	{
+	  $isNull = "not null";
+	}
+      printf("    %-30s  %-10s  %s\n",$name,$colType,$isNull );
+    }
+}
+    

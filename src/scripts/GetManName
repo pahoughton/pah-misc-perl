@@ -1,0 +1,48 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+# 
+# Title:            GetManName.pl
+# 
+# Description:
+# 
+# 	
+# 
+# Notes:
+# 
+# Programmer:	    Paul Houghton - (paul_houghton@wiltel.com)
+# 
+# Start Date:	    5/8/94
+# 
+# Modification History:
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1995/11/16 14:32:55  houghton
+# Initial Version.
+#
+# 
+
+$start = 0;
+
+while(<>)
+{
+  if(/^\.SH/)
+    {
+      $start = 0;
+    }
+  
+  if( $start )
+    {
+      chop;
+      print $_ ." ";
+    }
+  
+  if(/^\.SH NAME/)
+    {
+      print "\n"; 
+      $start = 1;
+    }
+}
+
+print "\n"; 

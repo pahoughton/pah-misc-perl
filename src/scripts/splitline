@@ -1,0 +1,39 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+# 
+# Title:            splitline.pl
+# 
+# Description:
+# 
+# 	
+# 
+# Notes:
+# 
+# Programmer:	    Paul Houghton - (paul_houghton@wiltel.com)
+# 
+# Start Date:	    5/8/94
+# 
+# Modification History:
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1995/11/16 14:33:02  houghton
+# Initial Version.
+#
+# 
+
+
+$width = 200;
+
+while(<>)
+{
+  while(length($_) > $width)
+    {
+      $pl = substr($_,0,$width);
+      substr($_,0,$width) = "-cont-> ";
+      print $pl,"\n"; 
+    }
+  print $_;
+}
+

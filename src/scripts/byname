@@ -1,0 +1,66 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+# 
+# Title:            byname.pl
+# 
+# Description:
+# 
+# 	
+# 
+# Notes:
+# 
+# Programmer:	    Paul Houghton - (paul_houghton@wiltel.com)
+# 
+# Start Date:	    5/28/95
+# 
+# Modification History:
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1995/11/16 14:32:56  houghton
+# Initial Version.
+#
+# 
+
+
+
+
+while(<>)
+{
+  chop;
+  ($path,$name) = /(.*)\/([^\/]+)/;
+  
+  $where{ $name } .= "$path ";
+  $count{ $name } ++;
+
+}
+
+foreach $n (sort(keys(%count)))
+{
+  if( $count{$n} > 1 )
+    {
+      print "$n\n";
+      foreach $d (split(/ /,$where{ $n } ) )
+	{
+	  @st = stat( "/$d/$n");
+	  push @dirs, "$st[10]:$st[7]:$st[1]:$d";
+	}
+      foreach $di ( sort(@dirs) )
+	{
+	  ($w,$sz,$in,$dn) = split(/:/,$di);
+	  
+	  @fctime = localtime($w);
+	  $when = sprintf ( "%02d/%02d/%02d %02d:%02d:%02d",
+			   $fctime[4],
+			   $fctime[3],
+			   $fctime[5],
+			   $fctime[2],
+			   $fctime[1],
+			   $fctime[0] ) ;
+	  
+	  printf "  -> $when  %6d $dn ($in)\n",$sz;
+	}
+      @dirs = ();
+    }
+}

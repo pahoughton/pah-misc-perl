@@ -1,0 +1,36 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+# 
+# Title:            lowerfn.pl
+# 
+# Description:
+# 
+# 	
+# 
+# Notes:
+# 
+# Programmer:	    Paul Houghton - (paul_houghton@wiltel.com)
+# 
+# Start Date:	    9/27/91
+# 
+# Modification History:
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1995/11/16 14:32:59  houghton
+# Initial Version.
+#
+# 
+
+
+
+while(<>)
+{
+  /(.*)/;
+  $oldname = $1;
+  $newname = $oldname;
+  $newname =~ tr/A-Z/a-z/;
+  print "Changing ",$oldname,"\t to ",$newname,"\n";
+  system "mv",$oldname,$newname;
+}

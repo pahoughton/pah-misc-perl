@@ -1,0 +1,36 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+# 
+# Title:            widest.line.pl
+# 
+# Description:
+# 
+# 	
+# 
+# Notes:
+# 
+# Programmer:	    Paul Houghton - (paul_houghton@wiltel.com)
+# 
+# Start Date:	    10/18/91
+# 
+# Modification History:
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1995/11/16 14:33:02  houghton
+# Initial Version.
+#
+# 
+
+while(<>)
+{
+  $len = length($_);
+  if($len > $max_len)
+    {
+      $max_len = $len;
+    }
+}
+
+print "Longest Line: ",$max_len,"\n";
+

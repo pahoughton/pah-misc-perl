@@ -1,0 +1,75 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+# 
+# Title:            multicol.pl
+# 
+# Description:
+# 
+# 	
+# 
+# Notes:
+# 
+# Programmer:	    Paul Houghton - (paul_houghton@wiltel.com)
+# 
+# Start Date:	    9/14/92
+# 
+# Modification History:
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1995/11/16 14:33:01  houghton
+# Initial Version.
+#
+# 
+
+
+$line_count = 65;
+
+$ln = 0;
+
+for($ln = 0; <> ; $ln++)
+{
+  chop($_);
+  if($ln < ($line_count * 1))
+    {
+      $col1[$ln % $line_count] = $_;
+      next;
+    }
+  if($ln < ($line_count * 2))
+    {
+      $col2[$ln % $line_count] = $_;
+      next;
+    }
+  if($ln < ($line_count * 3))
+    {
+      $col3[$ln % $line_count] = $_;
+      next;
+    }
+  if($ln < ($line_count * 4))
+    {
+      $col4[$ln % $line_count] = $_;
+      next;
+    }
+  if($ln < ($line_count * 5))
+    {
+      $col5[$ln % $line_count] = $_;
+      next;
+    }
+  if($ln < ($line_count * 6))
+    {
+      $col6[$ln % $line_count] = $_;
+      next;
+    }
+}
+
+for($line = 0; $line < $line_count; $line++)
+{
+  printf("  %-25s%-25s%-25s      %-25s%-25s%-25s  \n",
+	 $col1[$line],
+	 $col2[$line],
+	 $col3[$line],
+	 $col4[$line],
+	 $col5[$line],
+	 $col6[$line]);
+}

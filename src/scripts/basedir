@@ -1,0 +1,39 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+# 
+# Title:            basedir.pl
+# 
+# Description:
+# 
+# 	
+# 
+# Notes:
+# 
+# Programmer:	    Paul Houghton - (paul_houghton@wiltel.com)
+# 
+# Start Date:	    12/29/94
+# 
+# Modification History:
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1995/11/16 14:32:56  houghton
+# Initial Version.
+#
+# 
+
+
+while(<>)
+{
+  if( m#./([^/\n]+)# )		
+     { 
+       if( $1 ne $prev )
+	 {
+	   print "$1\n"; 
+	 }
+       $prev = $1;
+     }
+   }
+}
+

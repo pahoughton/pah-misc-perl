@@ -1,0 +1,140 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+# 
+# Title:            move.articles.pl
+# 
+# Description:
+# 
+# 	
+# 
+# Notes:
+# 
+# Programmer:	    Paul Houghton - (paul_houghton@wiltel.com)
+# 
+# Start Date:	    10/12/91
+# 
+# Modification History:
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1995/11/16 14:33:00  houghton
+# Initial Version.
+#
+# 
+
+
+opendir(THISDIR,".");
+@allfiles = grep(-T,readdir(THISDIR));
+
+foreach $fname (@allfiles)
+{
+  print $fname,"\n";
+  open(ART,"<".$fname);
+  while($artline = <ART>)
+    {
+      if($artline =~ /^Subject: (.*)$/)
+	{
+	  $artline = $1;
+	  $artline =~ tr/\//./;
+	  $artline =~ tr/\#():,;//d;
+	  reset(@subwords);
+	  
+	  @subwords = split(' ',$artline);
+	  $i = "1";
+	  $subliststring = "";
+	  
+	  reset(%sublist);
+	  
+	  foreach $subword (@subwords)
+	    {
+	      $sublist{$i} = $subword;
+	      $subliststring .= $i.":".$subword . " ";
+	      $i++;
+	    }
+	  last;
+	}
+		}
+  close(ART);
+  
+  print "Subject: ",$subliststring,"\n\n";
+  
+  $_ = <STDIN>;
+  
+  if(/^l/)
+    {
+      system("/usr/local/bin/less " . $fname);
+      print "\n",$fname,"\n";
+      print "Subject: ",$subliststring,"\n\n";
+      $_ = <STDIN>;
+    }
+  
+  if(/^p$/)
+    {
+      $_ = "sp";
+		}
+  
+  if(/^s *(.*)$/)
+    {
+      $sparts = $1;
+      $newfn = "";
+      
+      if($sparts eq "p")
+	{
+	  $sparts = $prevsparts;
+	}
+      $prevsparts = $sparts;
+      
+      if($sparts eq "a")
+	{
+	  foreach $sk (keys %sublist)
+	    {
+	      $newfn .= $sublist{$sk} . ".";
+	    }
+	}
+      else
+	{
+	  
+	  @fnparts = split(' ',$sparts);
+	  
+	  foreach $fnp (@fnparts)
+	    {
+	      if($fnp eq "d")
+		{
+		  ($dirname) = ($newfn =~ /^(.*)\.+$/);
+		  mkdir("files/" . $dirname,0770);
+		  $newfn = $dirname . "/";
+		}
+	      elsif($fnp =~ /\d+/)
+		{
+		  $newfn .= $sublist{$fnp} . ".";
+		}
+	      else
+		{
+		  $newfn .= $fnp . ".";
+		}
+	      
+	    }
+	}
+      
+      $newfn =~ s/\.+$//;
+      #		($newfilename) = ($newfn =~ /^(.*)\.+$/);
+      
+      system("mv -i ".$fname . " files/" . $newfn);
+      print "\nMoved ",$fname, " files/",$newfn,"\n\n";
+      
+    }
+  if(/^q$/)
+    {
+      last;
+    }
+  if(/^m (.*)$/)
+    {
+      system("mv -i ".$fname . " files/" . $1);
+      print "\nMoved ",$fname, " to files/",$1,"\n\n";
+    }
+  if(/^rm$/)
+    {
+      system("rm " . $fname);
+    }
+}

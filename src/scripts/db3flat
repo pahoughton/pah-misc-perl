@@ -1,0 +1,57 @@
+#!/usr/local/bin/perl
+# -*- Perl -*-
+#
+# convert db3-file to a flatfile (ascii-file with records consisting
+# of 1 line, and fields separated by a fieldseparator (tab) character)
+#
+# Newsgroups: comp.lang.perl
+# From: ntools1@be.oracle.com (student1)
+# Subject: Re: read DBF3 files
+# Sender: usenet@oracle.us.oracle.com (Oracle News Poster)
+# Organization: Oracle University
+# Date: Mon, 20 Dec 1993 19:02:59 GMT
+#
+#  Louis> Hello, Where can I find a script for transform DBF3 file into
+#  Louis> a tab or coma file?
+#
+#  Louis> Merci !
+#
+# Below, you find the solution.  The most important bug is that
+# the documentation is hidden in the source code.  :-)
+# (mail me on "pbijnens@be.oracle.com", if you need help with it.)
+#
+#
+# This is a shell archive (produced by shar 3.49)
+# To extract the files from this archive, save it to a file, remove
+# everything above the "!/bin/sh" line above, and type "sh file_name".
+#
+# made 09/25/1993 10:38 UTC by polleke@triton
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1995/11/16 14:32:58  houghton
+# Initial Version.
+#
+#
+
+require 'db3.pl';
+
+foreach $infile (@ARGV) {
+
+    ($basename) = ($infile =~ /(.*)\.dbf$/i);
+    die("$infile: name not like 'name.DBF'\n")  unless $basename;
+
+    open(DB, "< $infile")  ||  die("$infile: cannot open: $!\n");
+    open(OUT, "| repl -t pc2ascii > $basename")  ||
+           die("$basename: cannot open: $!\n");
+    select(OUT);
+
+    &db3init(*DB)  ||  die("$infile: cannot initialise db3-format\n");
+
+    &db3_flat_str;             # print out the structure
+    &db3_flat(*DB);            # followed by the records
+
+    close(DB)  ||  die("$infile: close: $!\n");
+    close(OUT)  ||  die("$basename: close: $!\n");
+}

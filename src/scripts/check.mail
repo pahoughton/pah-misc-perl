@@ -1,0 +1,74 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+# 
+# Title:            check.mail.pl
+# 
+# Description:
+# 
+# 	
+# 
+# Notes:
+# 
+# Programmer:	    Paul Houghton - (paul_houghton@wiltel.com)
+# 
+# Start Date:	    3/24/91
+# 
+# Modification History:
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1995/11/16 14:32:57  houghton
+# Initial Version.
+#
+# 
+
+
+
+$msg = 0;
+while(<>)
+{
+  if(/^From /)
+    {
+      $msg = $msg + 1;
+      $inhdr = 1;
+    }
+  if($inhdr == 1)
+    {
+      if(/From: (\w+)/)
+	{
+	  $from = $1;
+	}
+      if(/Date: .....(\d+)\s+(\w+)\s(\d+)\s(\d+):(\d+)/)
+	{
+	  $date = $1;
+	  $mnth = $2;
+	  $year = $3;
+	  $hour = $4;
+	  $min = $5;
+	  $month = (index("JanFebMarAprMayJunJulAugSepOctNovDec",$mnth)/3)+1;
+	}
+      if(/Subject: (.+)$/)
+	{
+	  $subject = $1;
+	  $inhdr = 0;
+	  
+	  $statln = <>;
+	  while($statln =~ /^[A-RT-Z][A-Z\-a-z0-9]*:/)
+	    {
+	      $statln = <>;
+	    }
+	  if($statln =~ /Status:/)
+	    {
+	      ($stat) = $statln =~ /Status: (\w+)/;
+	    }
+	  else
+	    {
+	      $stat = "N";
+	    }
+	  printf("%2d %-2s %-9s %2d/%02d %2d:%02d %s\n",
+		 $msg,$stat,$from,$month,$date,$hour,$min,$subject);
+	}
+    }
+}
+
