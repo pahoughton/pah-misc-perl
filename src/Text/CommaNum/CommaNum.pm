@@ -23,14 +23,15 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw(
-	
+  CommaNum	
 );
+
 our $VERSION = '0.01';
 
 
 # Preloaded methods go here.
 
-sub CommaNum( $ );
+sub CommaNum ($); #
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
@@ -40,37 +41,47 @@ __END__
 
 =head1 NAME
 
-Text::CommaNum - Perl extension for blah blah blah
+Text::CommaNum - Perl extension to add commas to numbers
 
 =head1 SYNOPSIS
 
   use Text::CommaNum;
-  blah blah blah
+
+  my $comma_num = CommaNum( 23412643.43 );
+
+  print "$comma_num\n"; # would output 23,412,643.43
 
 =head1 DESCRIPTION
 
-Stub documentation for Text::CommaNum, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
-
-Blah blah blah.
+The CommaNum function adds commas to number before every 3rd digit. It
+is based on the commify function described in L<perlfaq5>.
 
 =head2 EXPORT
 
-None by default.
+CommaNum
 
 
 =head1 AUTHOR
 
-A. U. Thor, E<lt>a.u.thor@a.galaxy.far.far.awayE<gt>
+Paul Houghton <paul.hougthon@wcom.com>
 
 =head1 SEE ALSO
 
-L<perl>.
+L<perl> L<perlfaq5>
 
 =cut
 
-sub CommaNum ( $ ) {
+# from perlfaq5 man page
+sub CommaNum ($) {
+  my ($num) = (@_);
+
+  $num = reverse $num;
+  $num =~ s<(\d\d\d)(?=\d)(?!\d*\.)><$1,>g;
+  return scalar reverse $num;
+}
+
+# My original code
+sub CommaNum_old ( $ ) {
   my( $num ) = (@_);
 
   my $whole = undef;
