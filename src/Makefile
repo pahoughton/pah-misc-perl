@@ -33,9 +33,12 @@ include Make/make.cfg.$(make_cfg_ver)
 SUBDIRS		=		\
 	App/Debug		\
 	Text/Fill		\
+	Text/CommaNum		\
 	Doc/Self		\
 	App/Options		\
-	ParseCxx
+	ParseCxx		\
+	Teamnet			\
+
 
 TARGETS		= $(standard_targets) debug
 
