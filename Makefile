@@ -51,6 +51,9 @@ default check install_debug install_default install_lib_all:
 install install_all:
 	$(call make_subdirs,$@,src docs,$($(@)_exports))
 
+rebuild_support_libs:
+	$(call rebuild_libs,$(SUPPORT_ITEMS))
+
 dist:
 	$(call make_dist_from_dim,infr_objs,mcmain,$(PROJECT_DIR))
 
