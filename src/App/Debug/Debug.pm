@@ -61,16 +61,14 @@ our @EXPORT = qw( &Debug
 
 our $VERSION = '1.01';
 
-sub Configure( % );
-sub Debug( $@ );
-sub DebugDumpHash ($$$@);
-
 # Preloaded methods go here.
 
 our $defaultOutLevel = 0;
 our $OutputLevel = \$defaultOutLevel;
 our $OutputIO = \*STDERR;
 our $debug = 0;
+
+use File::Basename;
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
@@ -144,12 +142,38 @@ sub Debug ($@) {
 
   # print "L: '$level' '$OutputLevel' '$$OutputLevel'\n";
   if( $level <= $$OutputLevel ) {
-    print $OutputIO "DEBUG($level): ",@rest,"\n";
+    my ($pkg, $fn, $ln) = caller;
+    if( $fn =~ /(.*) \(autosplit [^\)]+\)/ ) {
+      $fn = $1;
+    }
+    $fn = basename( $fn );
+    print $OutputIO "DEBUG($level) $fn:$ln:",@rest,"\n";
   }
 }
 
+
 sub DebugDumpHash ($$$@) {
   local $dbgLevel   = shift( @_ );
+  local $prefix	    = shift( @_ );
+  local $hash	    = shift( @_ );
+  local @ignore	    = (@_);
+
+  if( $dbgLevel <= $$OutputLevel ) {
+    DumpHashTo( $OutputIO, $prefix, $hash, @ignore );
+  }
+}
+
+
+sub DumpHash ($$@) {
+  local $prefix	    = shift( @_ );
+  local $hash	    = shift( @_ );
+  local @ignore	    = (@_);
+
+  DumpHashTo( \*STDOUT, $prefix, $hash, @ignore );
+}
+
+sub DumpHashTo ($$$@) {
+  local $destIO	    = shift( @_ );
   local $prefix	    = shift( @_ );
   local $hash	    = shift( @_ );
   local @ignore	    = (@_);
@@ -159,31 +183,29 @@ sub DebugDumpHash ($$$@) {
 
   # print "DUMPING HASH: '$dbgLevel' '$prefix' '$hash' '@ignore'\n";
 
-  if ( $dbgLevel <= $$OutputLevel ) {
-
-    if ( $ignore[0] ) {
-      if ( ref( $ignore[0] ) eq "ARRAY" ) {
-	# print "is ref\n";
-	$skip = join(" ",@$ignore );
-      } else {
-	# print "not ref\n";
-	$skip = join(" ",@ignore );
-      }
+  if ( $ignore[0] ) {
+    if ( ref( $ignore[0] ) eq "ARRAY" ) {
+      # print "is ref\n";
+      $skip = join(" ",@$ignore );
+    } else {
+      # print "not ref\n";
+      $skip = join(" ",@ignore );
     }
-    # print "SKIP: '$skip'\n";
-    foreach $k (keys(%$hash)) {
-      Debug( $dbgLevel, "$prefix:$k: '$$hash{ $k }'" );
+  }
+  # print "SKIP: '$skip'\n";
+  foreach $k (keys(%$hash)) {
 
-      if ( $skip !~ /$k/ && ref( $$hash{ $k } ) eq "HASH" ) {
-	DebugDumpHash( $dbgLevel, "$prefix:$k", $$hash{ $k }, $skip );
+
+    if ( $skip !~ /$k/ ) {
+      if( ref( $$hash{ $k } ) eq "HASH" ) {
+	DumpHashTo( $destIO, "$prefix:$k", $$hash{ $k }, $skip );
       } else {
-	# if( $$hash{ $k } =~ /^\s/ || $$hash{ $k } =~ /[ \t]$/ ) {
-	# Debug( 2, "Not Striped: $prefix:$k: '$$hash{ $k }'\n" );
-	# }
+	print $destIO "HASH: $prefix:$k: '$$hash{ $k }'\n";
       }
     }
   }
 }
+
 
 #
 # Revision Log:

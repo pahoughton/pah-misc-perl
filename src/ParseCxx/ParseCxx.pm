@@ -27,7 +27,11 @@ package ParseCxx;
 require 5.006;
 use strict;
 use warnings;
-
+use Text::Tabs;
+use File::Basename;
+use App::Debug;
+use Carp;
+use English;
 
 require Exporter;
 use AutoLoader qw(AUTOLOAD);
@@ -57,17 +61,16 @@ our $debug = 0;
 
 # Preloaded methods go here.
 
+our $PARSE_NR;
+
+our $commentSection;
+# our $commentMainClass;
+# our $prevSection;
+our $commentSectionStartLineNum;
+
+our $CNTX_CONSTRUCTOR_ARG_INIT = "cntx constructor arg init" ; # context value
+our $CNTX_FUNC_BODY = "cntx function body";
 # Autoload methods go after =cut, and are processed by the autosplit program.
-sub ParseHeaderInfo ($$);
-sub GetNested ($$$$);
-sub ParseOpenBrace ($$$);
-sub ParseStatement ($$$);
-sub ParseLabel ($$$);
-sub ParseCloseBrace ($$$);
-sub StoreFunc ($$$$$);
-sub SetFuncDesc ($$$$);
-sub ParseComment ($$);
-sub Parse ($$);
 
 1;
 __END__
@@ -100,11 +103,6 @@ Paul Houghton <paul.houghton@wcom.com>
 perl(1).
 
 =cut
-
-use Text::Tabs;
-use File::Basename;
-use App::Debug;
-use Carp;
 
 sub ParseHeaderInfo ($$) {
   my $in    = shift(@_);
@@ -177,28 +175,40 @@ sub ParseHeaderInfo ($$) {
   }
 }
 
-sub GetNested ($$$$) {
+sub GetNested ($$$$$) {
   my $open  = shift( @_ );
   my $close = shift( @_ );
   my $text  = shift( @_ );
   my $dest  = shift( @_ );
+  my $stripOpenClose = shift( @_ );
 
   Debug( 5, "GETNESTED '$$text'\n" );
-  if( $$text =~ /^([^$open$close]*)$open(.*)/ ) {
-    $$dest .= "$1 $open";
-    $$text = $2;
-    if( ! GetNested( $open, $close, $text, $dest ) ) {
+  if( $$text =~ /^([^$open$close]*)($open)(.*)/s ) {
+    if( ! $stripOpenClose ) {
+      $$dest .= "$1$2"
+    }
+    $$text = $3;
+
+    while( $$text =~ /^([^$open$close]*)($open)(.*)/s ) {
+      if( ! GetNested( $open, $close, $text, $dest, 0 ) ) {
+	return( 0 );
+      }
+    }
+
+    Debug( 5, "LOOKING FOR CLOSE: '$close'\n" );
+    if( $$text =~ /^([^$close]*)($close)(.*)/s ) {
+      $$dest .= "$1";
+      if( ! $stripOpenClose ) {
+	$$dest .= "$2";
+      }
+      $$text = $3;
+      Debug( 5, "FOUND CLOSE\n" );
+      return( 1 );
+    } else {
       return( 0 );
     }
-  }
-  Debug( 5, "LOOKING FOR CLOSE: '$close'\n" );
-  if( $$text =~ /^([^$close]*)$close(.*)/ ) {
-    $$dest .= "$1 $close";
-    $$text = $2;
-    Debug( 5, "FOUND CLOSE\n" );
-    return( 1 );
   } else {
-    return( 0 );
+    return( 1 );
   }
 }
 
@@ -229,8 +239,8 @@ sub ParseOpenBrace ($$$) {
 
     ++ $$info{ typeNum };
     $$info{ "type" }->{ $$info{ typeNum } } = { "type" => "$type",
-					      name => "$name"
-					    };
+						name => "$name"
+					      };
 
     $$info{ "type" }->{ $$info{ typeNum } }->{ $type }->{ name } = $name;
     $$info{ "type" }->{ $$info{ typeNum } }->{ $type }->{ $name } =
@@ -298,7 +308,7 @@ sub ParseOpenBrace ($$$) {
     return( $$info{ "type" }->{ $$info{ typeNum } }->{ $type }->{ $name } );
   } else {
     $info = ParseStatement( $statement, $info, $context );
-    $$context = "funcbody";
+    $$context = $CNTX_FUNC_BODY;
     return( $info );
   }
 }
@@ -313,54 +323,54 @@ sub ParseStatement ($$$) {
   my $rest;
 
   Debug( 5, "CONTEXT: $$context\n" );
-  if( $$context eq "funcbody" ) {
+  if( $$context eq $CNTX_FUNC_BODY ) {
     return( $info );
   }
 
   my $funcName = "";
   my $sig;
 
-  if( $statement =~ /^\s*([^\(]+)operator\s*\(\s*\)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  $1;
-    $funcName = "operator ()";
-    $sig = $2;
+
+  my $pre;
+  my $nested = undef;
+
+  if( $statement =~ /([^\(]*operator[^\(]+\(\s*\))(\s+\(.*)$/s ) {
+    $pre = $1;
+    $rest = $2;
+    GetNested( '\(','\)',\$rest, \$nested, 1 );
+  } elsif( $statement =~ /([^\(]*operator[^\(]+)(\(\s*\))(.*)/s ) {
+    $pre = $1;
+    $nested = " ";
     $rest = $3;
-  } elsif( $statement
-	   =~ /^\s*operator\s*([^()]+)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  $1;
-    $funcName = "operator $1";
-    $sig = $2;
-    $rest = $3;
-  } elsif( $statement
-	   =~ /^\s*([^\(]+)operator\s*([^()]+)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  $1;
-    $funcName = "operator $2";
-    $sig = $3;
-    $rest = $4;
-  } elsif( $statement =~ /^\s*([^\(]+)\s+(\w+)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  $1;
-    $funcName = $2;
-    $sig = $3;
-    $rest = $4;
-  } elsif( $statement =~ /^\s*([^\(]+)\s+(~\w+)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  $1;
-    $funcName = $2;
-    $sig = $3;
-    $rest = $4;
-  } elsif( $statement =~ /^\s*(\w+)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  "";
-    $funcName = $1;
-    $sig = $2;
-    $rest = $3;
-  } elsif( $statement =~ /^\s*(~\w+)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  "";
-    $funcName = $1;
-    $sig = $2;
-    $rest = $3;
+  } elsif( $statement =~ /([^\(]*)(\(.*)/s ) {
+    $pre = $1;
+    $rest = $2;
+    GetNested( '\(','\)',\$rest, \$nested, 1 );
   }
 
-  if( length(  $funcName ) ) {
-    if( $return =~ /friend(.*)/ ) {
+  if( $nested ) {
+
+    Debug( 3, "STMT GN:\n pre: '$pre' \n nest:'$nested'\n rest:'$rest'" );
+
+    if( $pre =~ /(.*)(operator.*)$/ ) {
+      $return = $1;
+      $funcName = $2;
+      $sig = $nested;
+    } elsif ( $pre =~ /(.*)\s+(~?\w+)\s*$/ ) {
+      $return = $1;
+      $funcName = $2;
+      $sig = $nested;
+    } elsif ( $pre =~ /\s*(~?\w+)\s*$/ ) {
+      $funcName = $1;
+      $sig = $nested;
+    } else {
+      confess( "PARSE ERROR: func '$statement'" );
+    }
+  }
+
+
+  if ( length(  $funcName ) ) {
+    if( $return && $return =~ /friend(.*)/ ) {
       $return = $1;
       $return =~ s/^\s+//;
       my $topInfo = $info;
@@ -426,9 +436,7 @@ sub ParseStatement ($$$) {
     }
   }
 
- 
   return( $info );
-
 }
 
 sub ParseLabel ($$$) {
@@ -458,7 +466,7 @@ sub ParseLabel ($$$) {
     $sig = $3;
     $rest = $4;
     StoreFunc( $return, $funcName, $sig, $rest, $info );
-    # $$context = "funcbody";
+    $$context = $CNTX_CONSTRUCTOR_ARG_INIT;
   }
 
   Debug( 5, "$info\n" );
@@ -473,7 +481,7 @@ sub ParseCloseBrace ($$$) {
   Debug( 5, "CLOSE BRACE:\n'$statement'\n" );
   Debug( 5, "CONTEXT: $$context\n" );
 
-  if( $$context eq "funcbody" ) {
+  if( $$context eq $CNTX_FUNC_BODY ) {
     $$context = "decl";
     Debug( 5, "CONTEXT: $$context\n" );
     return( $info );
@@ -517,7 +525,9 @@ sub StoreFunc ($$$$$) {
   my $rest	= shift(@_);
   my $info	= shift(@_);
 
+  Debug( 5, "StoreFunc( $return, $name, $sig, $rest )" );
   my @args;
+  my $funcTmpl;
   my $funcType;
   my $funcRet;
   my $funcConst;
@@ -533,6 +543,16 @@ sub StoreFunc ($$$$$) {
   $name =~ s/^\s+//;
   $name =~ s/\s+$//;
   $name =~ s/\s+/ /g;
+
+  if( $return =~ /template/ ) {
+    my $tmplArgs;
+    GetNested( '<','>',\$return, \$tmplArgs, 0 );
+    $funcTmpl = "$tmplArgs";
+    $funcTmpl =~ s/^\s+//;
+    $funcTmpl =~ s/\s+$//;
+  } else {
+    $funcTmpl = "";
+  }
 
   if( $return =~ /(virtual|inline|static)\s*(.*)/ ) {
     $funcType = $1;
@@ -560,6 +580,7 @@ sub StoreFunc ($$$$$) {
   $funcRet =~ s/\s+$//;
 
   Debug( 5, "FOUND FUNCT: $name $sig\n
+  tmpl: '$funcTmpl'
   type: '$funcType'
    ret: '$funcRet'
   name: '$name'
@@ -570,13 +591,14 @@ sub StoreFunc ($$$$$) {
   ++ $$info{ funcNum };
   $$info{ func }->{ $$info{ funcNum } } =
     {
-     type	    => $funcType,
-     ret	    => $funcRet,
-     name	    => $name,
-     args	    => $sig,
-     const	    => $funcConst,
-     virt	    => $funcPurVirtual,
-     desc	    => ""
+     tmpl	=> $funcTmpl,
+     type	=> $funcType,
+     ret	=> $funcRet,
+     name	=> $name,
+     args	=> $sig,
+     const	=> $funcConst,
+     virt	=> $funcPurVirtual,
+     desc	=> ""
     };
   {
     my $a;
@@ -609,7 +631,7 @@ sub StoreFunc ($$$$$) {
     # Debug( 0, "@argList );
   }
 	
-
+  return( $$info{ func }->{ $$info{ funcNum } } );
 }
 
 sub FindInnerClass {
@@ -643,7 +665,7 @@ sub FindInnerClass {
     }
   }
   if( $subType == $type ) {
-    confess "ERROR: inner type '$inClasses' not found."
+    confess "ERROR: $$info{ filename }:$PARSE_NR inner type '$inClasses' not found."
   }
   Debug( 3, "Found inner class '$subType'" );
   return( $subType );
@@ -746,82 +768,82 @@ sub SetTypeDesc {
   }
 }
 
-sub SetFuncDesc ($$$$) {
+sub SetFuncDesc ($$$) {
   my $info	= shift( @_ );
   my $prot	= shift( @_ );
-  my $funcDecl	= shift( @_ );
-  my $funcDesc	= shift( @_ );
+  my $desc	= shift( @_ );
 
+  my $return = "";
+  my $funcName = "";
+  my $sig = "";
+  my $rest = "";
 
-  my $return;
-  my $funcName;
-  my $sig;
-  my $rest;
+  my $funcTmpl = "";
+  my $funcType = "";
+  my $funcRet = "";
+  my $funcConst = "";
+  my $funcPurVirtual = "";
+  my $funcDesc = "";
+  my $nested = "";
 
-  my $funcType;
-  my $funcRet;
-  my $funcConst;
-  my $funcPurVirtual;
-
-  if( $funcDecl
-      =~ /^\s*(\w[^\(]+)\s+([\w:]+::)operator\s*\(\s*\)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  $1;
-    $funcName = "$2"."operator ()";
-    $sig = $3;
-    $rest = $4;
-  } elsif( $funcDecl
-	   =~ /^\s*([\w:]+::)operator\s*([^()]+)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  "";
-    $funcName = "$1"."operator $2";
-    $sig = $3;
-    $rest = $4;
-  } elsif( $funcDecl
-	   =~ /^\s*(\w[^\(]+)\s+([\w:]+::)operator\s*([^()]+)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  $1;
-    $funcName = "$2"."operator $3";
-    $sig = $4;
-    $rest = $5;
-  } elsif( $funcDecl
-	   =~ /^\s*(\w[^\(]+)operator\s*\(\s*\)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  $1;
-    $funcName = "operator ()";
-    $sig = $2;
+  if( $desc =~ /([^\(]*operator[^\(]+\(\s*\))(\s+\(.*)$/s ) {
+    $pre = $1;
+    $rest = $2;
+    GetNested( '\(','\)',\$rest, \$nested, 1 );
+  } elsif( $desc =~ /([^\(]*operator[^\(]+)(\(\s*\))(.*)/s ) {
+    $pre = $1;
+    $nested = " ";
     $rest = $3;
-  } elsif( $funcDecl
-	   =~ /^\s*operator\s*([^()]+)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  "";
-    $funcName = "operator $1";
-    $sig = $2;
-    $rest = $3;
-  } elsif( $funcDecl
-	   =~ /^\s*(\w[^\(]+)operator\s*([^()]+)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  $1;
-    $funcName = "operator $2";
-    $sig = $3;
-    $rest = $4;
-  } elsif( $funcDecl =~ /^\s*(\w[^\(]+)\s+([\w:]+)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  $1;
-    $funcName = $2;
-    $sig = $3;
-    $rest = $4;
-  } elsif( $funcDecl =~ /^\s*(\w[^\(]+)\s+(~[\w:]+)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  $1;
-    $funcName = $2;
-    $sig = $3;
-    $rest = $4;
-  } elsif( $funcDecl =~ /^\s*([\w:]+)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  "";
-    $funcName = $1;
-    $sig = $2;
-    $rest = $3;
-  } elsif( $funcDecl =~ /^\s*(~[\w:]+)\s*\(([^\)]*)\)(.*)$/ ) {
-    $return =  "";
-    $funcName = $1;
-    $sig = $2;
-    $rest = $3;
-  } else {
-    die "FUNC DECL PARSE ERROR: '$funcDecl'";
+  } elsif( $desc =~ /([^\(]*)(\(.*)/s ) {
+    $pre = $1;
+    $rest = $2;
+    GetNested( '\(','\)',\$rest, \$nested, 1 );
   }
+
+  if( $nested ) {
+    $sig = $nested;
+    if( $pre =~ /(.*)\s+([\w:]+operator.*)$/s ) {
+      $return = $1;
+      $funcName = $2;
+    } elsif( $pre =~ /(.*)\s+(operator.*)$/s ) {
+      $return = $1;
+      $funcName = $2;
+    } elsif ( $pre =~ /(.*)\s+([\w:]+)\s*$/s ) {
+      $return = $1;
+      $funcName = $2;
+    } elsif ( $pre =~ /\s*([\w:]+)\s*$/s ) {
+      $return = "";
+      $funcName = $1;
+    } else {
+      confess( "PARSE ERROR: func '$desc'" );
+    }
+  } else {
+    confess( "PARSE ERROR: $info{ filename }:$PARSE_NR",
+	     " func decl not found in\n",
+	     $desc );
+  }
+
+  if( $rest =~ /^\s*const\s*=\s*0\s*;*(.*)/s ) {
+    $funcConst = "const";
+    $funcDesc = $1;
+  } elsif ( $rest =~ /^\s*const\s*;*(.*)/s ) {
+    $funcConst = "const";
+    $funcDesc = $1;
+  } elsif( $rest =~ /^\s*;*(.*)/s ) {
+    $funcDesc = $1;
+  } else {
+    $funcDesc = $rest;
+  }
+
+  Debug( 2, "FUNCT VALUES: $funcName $sig\n
+  type: '$funcType'
+   ret: '$return'
+  name: '$funcName'
+  args: '$sig'
+  cons: '$funcConst'
+  virt: '$funcPurVirtual'
+  desc: '$funcDesc'\n" );
+
 
   $sig =~ s/^\s+//;
   $sig =~ s/\s+$//;
@@ -835,23 +857,18 @@ sub SetFuncDesc ($$$$) {
     $sig = "void";
   }
 
+  if( $return =~ /template/ ) {
+    my $tmplArgs;
+    GetNested( '<','>',\$return, \$tmplArgs, 0 );
+    $funcTmpl = "$tmplArgs";
+  }
+
   if( $return =~ /(virtual|inline|static)\s*(.*)/ ) {
     $funcType = $1;
     $funcRet = $2;
   } else {
     $funcType = "";
     $funcRet = $return;
-  }
-  if( $rest =~ /const/ ) {
-    $funcConst = "const";
-  } else {
-    $funcConst = "";
-  }
-
-  if( $rest =~ /=\s*0/ ) {
-    $funcPurVirtual = "= 0";
-  } else {
-    $funcPurVirtual = "";
   }
 
   $funcType =~ s/^\s+//;
@@ -861,6 +878,7 @@ sub SetFuncDesc ($$$$) {
   $funcRet =~ s/\s+$//;
 
   Debug( 2, "FOUND FUNCT: $funcName $sig\n
+  tmpl: '$funcTmpl'
   type: '$funcType'
    ret: '$funcRet'
   name: '$funcName'
@@ -873,8 +891,8 @@ sub SetFuncDesc ($$$$) {
 
   if( $funcName !~ /::/ ) {
     if( $prot eq "global" ) {
-      Debug( 3, "GLOBAL FUNCLIST\n" );
-      DebugDumpHash(  5, "GLOBAL", $info , "down" );
+      # Debug( 3, "GLOBAL FUNCLIST\n" );
+      # DebugDumpHash(  5, "GLOBAL", $info , "down" );
       $funcList = $$info{ func };
     } else {
       $funcList
@@ -901,7 +919,7 @@ sub SetFuncDesc ($$$$) {
       die "IMPOSIBLE ! ::";
     }
   }
-  DebugDumpHash( 2, "TEST:", $funcList , "down" );
+  # DebugDumpHash( 2, "TEST:", $funcList , "down" );
 
   # Debug( 2, "DUMP COMPLETE\n" );
 
@@ -921,221 +939,155 @@ sub SetFuncDesc ($$$$) {
   }
 
 
-  DebugDumpHash(  2, "FUNCS", $funcList , "down" );
+  # DebugDumpHash(  3, "FUNCS", $info , "down" );
   if( ! $foundFunc ) {
-    DebugDumpHash(  0, "FUNCS", $funcList , "down" );
-    confess "ERROR: $$info{ filename } function '$funcName( $sig ) $funcConst' not found.";
+    if( $prot eq "global" ) {
+
+      # Go ahead and set Global even if not found. The
+      # function was probably declared in an 'inlines' file.
+
+      my $funcInfo = StoreFunc( "$funcTmpl $funcType $funcRet",
+				$funcName,
+				$sig,
+				"$funcConst $funcPurVirtual",
+				$info );
+      $funcInfo{ desc } = $funcDesc;
+    } else {
+      DebugDumpHash(  0, "FUNCS", $funcList , "down" );
+      confess( "ERROR: $$info{ filename }:$PARSE_NR function",
+	       " '$funcName( $sig ) $funcConst' not found.\n$desc" );
+    }
+  }
+}
+
+sub SetFieldDesc ($$$) {
+  my $info	= shift( @_ );
+  my $prot	= shift( @_ );
+  my $desc	= shift( @_ );
+
+  my $name;
+  my $type;
+  my $const;
+  if( $decl = ~ /\s*static const\s+(\w.*)\s+(\w+)\s*;*\s*(.*)$/ ) {
+    $section = "static_const";
+    $type = $1;
+    $name = $2;
+    $desc = $3;
+  } elsif ( $decl =~ /\s*(const)\s+(\w.*)\s+(\w+)\s*;*\s*(.*)$/ ) {
+    $section = "variable";
+    $type = $1;
+    $name = $2;
+    $desc = $3;
+    $const = "const";
+  } elsif ( $decl =~ /\s*(\w.*)\s+(\w+)\s*;*\s*(.*)$/ ) {
+    $section = "variable";
+    $type = $1;
+    $name = $2;
+    $desc = $3;
+  } else {
+    confess "FIELD DECL PARSE ERROR: '$decl'";
+  }
+
+  my $searchList;
+  if( $name !~ /::/ ) {
+    if( $prot eq "global" ) {
+      $searchList = $$info{ $section };
+    } else {
+      $searchList
+	= $$info{ "type"
+		}->{ $$info{ MainClass }->{ number }
+		   }->{ $$info{ MainClass }->{ "type" }
+		      }->{ $$info{ MainClass }->{ name }
+			 }->{ $prot }->{ $section };
+    }
+  } elsif ( $name =~ /(.*)::(\w+)$/ ) {
+    my $inner = $1;
+    my $name = $2;
+    my $type = FindInnerClass( $info, $inner );
+    $searchList = $$type{ $prot }->{ $section };
+  } else {
+    confess( "IMPOSIBLE ! ::" );
+  }
+
+  my $found = 0;
+  foreach my $n (keys( %$searchList )) {
+    if( $name eq $searchList{ $n }->{ name } ) {
+      $searchList{ $n }->{ desc } = $desc;
+      $found = 1;
+      last;
+    }
+  }
+
+  if( ! $found ) {
+    confess( "ERROR: $$info{ filename }:$PARSE_NR field '$name' not found" );
   }
 }
 
 
-  my $section;
-  my $mainClass;
-  my $prevSection;
-
-  sub ParseComment ($$) {
-    my $comment = shift(@_);
-    my $info  = shift(@_);
-
-    $prevSection = $section;
-
-    $tabstop = 8;
-    $comment = expand( $comment );
-    Debug( 2, "$comment" );
-    # print $comment;
-    if( $comment =~ m@^ {1,4}([A-Z]\w[^:]+):\s*(.*)@ ) {
-      Debug( 2, "SECTION: $1\n" );
-      $section = $1;
-      $text = $2;
-      $section =~ s/^\s+//;
-      $section =~ s/\s*$//;
-
-      $$info{ comments }->{ $section } = "$text";
-      # Debug( 5, "Found section: '$section'\n" );
-    } else {
-      if( $section && length( $section ) ) {
-	$text = $comment;
-	$$info{ comments }->{ $section } .= "$text";
-      }
-    }
-    $comment = "";
-
-    if( $prevSection && length( $prevSection ) ) {
-      if( $prevSection ne $section ) {
-	Debug( 1, "NEW SECTION\n" );
-	# Data Types Section
-	if( $prevSection =~ /data types/i ) {
-	  my $text = $$info{ comments }->{ $prevSection };
-	  my $line;
-	  my $type;
-	  my $name;
-	  my $desc;
-	  foreach $line (split(/\n/, $text)) {
-	    if( $line
-		=~ /^\s+(class|struct|typedef|enum)\s+([\w:]+)\s*(.*)$/ ) {
-	      my $tmpType = $1;
-	      my $tmpName = $2;
-	      my $tmpDesc = "$3\n";
-
-	      SetTypeDesc( $info, "public", $type, $name, $desc );
-
-	      $name = $tmpName;
-	      $type = $tmpType;
-	      $desc = $tmpDesc;
-	    } elsif ( $line =~
-		      /^\s*([\w:]+)\s+(class|struct|typedef|enum)\s*(.*)$/ ) {
-	      my $tmpName = $1;
-	      my $tmpType = $2;
-	      my $tmpDesc = "$3\n";
-
-	      SetTypeDesc( $info, "public", $type, $name, $desc );
-
-	      $name = $tmpName;
-	      $type = $tmpType;
-	      $desc = $tmpDesc;
-	    } else {
-	      $desc .= "$line\n";
-	    }
-	  }
-	  SetTypeDesc( $info, "public", $type, $name, $desc );
-	}
-
-	if( $prevSection =~ /public interface/i
-	    || $prevSection =~ /constructors/i
-	    || $prevSection =~ /destructors/i
-	    || $prevSection =~ /accociated functions/i ) {
-	  my $text = $$info{ comments }->{ $prevSection };
-	  my $sectProt = "public";
-	  if( $prevSection =~ /protected interface/i ) {
-	    $sectProt = "protected";
-	  } elsif ( $prevSection =~ /accociated functions/i ) {
-	    $sectProt = "global";
-	  }
-	  Debug( 3, "$prevSection:\n$text\n" );
-	  DebugDumpHash(  3, "DESC", $info , "down" );
-	  # $tabstop = 7;
-	  # my @origLines = split( /\n/,$text );
-	  # my @detabLines = expand( @origLines );
-	  # $text = join( /\n/,@detabLines );
-	  # $text = expand( $text );
-	  # $text =~ s/ +\n/\n/g;
-	  # Debug( 1, "EXPANDED:\n$text\n" );
-
-	  my $funcDecl;
-	  my $funcDesc;
-	  my $context;
-	  foreach $line (split(/\n/,$text)) {
-	    Debug( 1, "LINE: '$line'\n" );
-	    if( $line =~ /^ {$tabstop}(\S.*)$/ ) {
-	      $context = "decl";
-	      my $tmpDecl = $1;
-	      if( $line =~ /\(/ ) {
-		$context = "declOpen";
-		if( $line =~ /\(.*\)/ ) {
-		  $context = "decl";
-		}
-	      }
-	      Debug( 1, "FP: '$tmpDecl' $context\n");
-	      if( $funcDesc  =~ /\S/ ) {
-		Debug( 1, "FUNC: '$funcDecl'\n");
-		Debug( 1, "DESC:\n'$funcDesc'\n");
-		if( length( $funcDecl ) ) {
-		  SetFuncDesc( $info, $sectProt, $funcDecl, $funcDesc );
-		}
-		$funcDecl = $tmpDecl;
-		$funcDesc = "";
-	      } else {
-		$funcDecl .= " $tmpDecl";
-	      }
-	    } elsif( $line =~ /^( {9,}\S.*)$/ ) {
-	      my $tmpLine = $1;
-	      if( $context eq "declOpen" ) {
-		$funcDecl .= " $tmpLine";
-		Debug( 1, "FPO: '$funcDecl'\n" );
-		# chop $funcDecl;
-		if( $line =~ /\)/ ) {
-		  $context = "decl";
-		}
-	      } else {
-		$funcDesc .= "$tmpLine\n";
-		Debug( 1, "FD: '$funcDesc'\n" );
-		$context = "desc";
-	      }
-	    } elsif( $line =~ /^\s*$/ ) {
-	      if( $context eq "decl" ) {
-		$funcDecl = "";
-	      } else {
-		$funcDesc .= "\n";
-	      }
-	      next;
-	    } else {
-	      die "PARSE ERROR";
-	    }
-	  }
-	}
-	# next section
-      } else {
-	# Debug( 1, "SAME SECTION: $prevSection\n" );
-      }
-    }
-  }
-
 
 sub Parse ($$) {
   my $fn	    = shift( @_ );
-  my $topContainer  = shift( @_ );
+  my $topHash  = shift( @_ );
 
-  $$topContainer{ filename } = $fn;
-  $$topContainer{ TopLevel } = 1;
+  $$topHash{ filename } = $fn;
+  $$topHash{ TopLevel } = 1;
+  $$topHash{ define_num } = 1;
+  $$topHash{ macro_num } = 1;
 
   open( IN, "< $fn" )
     || die "open '$fn' - $!";
 
-  ParseHeaderInfo( \*IN, $topContainer );
+  ParseHeaderInfo( \*IN, $topHash );
 
   my $comment = "";
   my $continue;
   my @containerStack;
-  my $container = $topContainer;
+  my $container = $topHash;
   my $context = "decl";
+  my $trash;
+  my $statement;
+  my $line;
 
   while ( <IN> ) {
-    # Debug( 5, "SRC: $_" );
+    Debug( 5, "SRC: $_" );
+
+    $line = undef;
+
     if ( $continue ) {
       $value = $_;
       chop $value;
       if ( $value =~ /\\$/ ) {
 	chop $value;
-	$$continue{ $contItem } .= " $value";
+	$$continue .= " $value";
       } else {
-	$$continue{ $contItem } .= " $value";
-	reset 'continue';
+	$$continue .= " $value";
+	$continue = undef;
       }
       next;
     }
 
     if ( ! $inComment ) {
       if ( m@(.*)/\*(.*)@ ) {
-	$statement = " $1";
-	$rest = $2;
+	$line = "$1\n";
+	$rest = "$2";
 	if ( $rest =~ m@(.*)\*/(.*)@ ) {
 	  $comment = "  $1";
-	  $statement .= " $2";
+	  $line = "$2\n";
 	} else {
 	  $inComment = 1;
-	  $comment = "  $rest";
+	  $comment = "  $rest\n";
 	}
-      }
-      if ( m@//(.*)@ ) {
-	$comment = "  $1";
-	$comment .= "\n";
+      } elsif( m@((?<!//).*)//(.*)@ ) {
+	$line = "$1\n";
+	$comment = "  $1\n";
+      } else {
+	$line = $_;
       }
     } else {
       if ( m@(.*)\*/(.*)@ ) {
-	$comment = "$1";
-	$comment .= "\n";
+	$comment = "$1\n";
 	$inComment = 0;
-	$statement .= " $2";
+	$line = "$2\n";
 	next;
       } else {
 	if( /^(\s*)(\*+)(.*)$/ ) {
@@ -1154,24 +1106,47 @@ sub Parse ($$) {
     }
 
     if ( $comment && length( $comment ) ) {
-      ParseComment( $comment, $topContainer );
+      ParseComment( $comment, $topHash );
       $comment = "";
+      if( ! $line ) {
+	next;
+      }
+    }
+
+    Debug( 5, "LINE: $line" );
+    $_ = $line;
+
+    if ( /\s*\#define\s+(\w+)\s+(.*)/ ) {
+      my $defName = $1;
+      my $defValue = $2;
+      my $defNum = $$topHash{ define_num };
+      ++ $$topHash{ define_num };
+      $$topHash{ defines }->{ $defNum } = { name => $defName };
+
+      if ( $defValue =~ /\\$/ ) {
+	$trash = "";
+	$$continue = \$trash;
+      }
+      Debug( 4, "DEFINE: $defName" );
       next;
     }
 
-    if ( /\s*\#define\s+(\w+)\s+(.*)/ ) {
-      $name = $1;
-      $value = $2;
-      if ( $value =~ /\\$/ ) {
-	$continue = $$topContainer{ defines };
-	$contItem = $name;
-	chop $value;
-	$value =~ s/\s+$//;
-	$$topContainer{ defines } = { $name => $value };
-      } else {
-	$value =~ s/\s+$//;
-	$$topContainer{ defines } = { $name => $value };
+    if ( /\s*\#define\s+(\w+)\(([^\)]+)\)/ ) {
+      my $macName = $1;
+      my $macArgs = $2;
+      my $macNum = $$topHash{ macro_num };
+      Debug( 3, "MACRO: $macName" );
+      ++ $$topHash{ macro_num };
+
+      $$topHash{ macros }->{ $macNum } = { name => $macName,
+					   args => $macArgs
+					 };
+
+      if ( /\\$/ ) {
+	$trash = "";
+	$$continue = \$trash;
       }
+      DebugDumpHash( 4, "MACRO", $$topHash{ macros }, "down" );
       next;
     }
 
@@ -1183,11 +1158,22 @@ sub Parse ($$) {
     chop;
     $statement .= " $_";
 
-    if ( $context eq "funcbody" ) {
+    if( $context eq $CNTX_CONSTRUCTOR_ARG_INIT ) {
+      if( $statement =~ /([^\{]+)\{(.*)$/s ) {
+	$statement = $2;
+	$context = $CNTX_FUNC_BODY;
+      } else {
+	next;
+      }
+    }
+
+    if ( $context eq $CNTX_FUNC_BODY ) {
       my $body;
-      my $tmp = $statement;
-      if ( GetNested( '{', '}', \$tmp, \$body ) ) {
-	Debug( 5, "GOT BODY:\n$body\n" );
+      my $tmp = " \{ $statement";
+      Debug( 5, "CNTX: funcbody '$tmp'" );
+      if( GetNested( '{', '}', \$tmp, \$body, 0 ) ) {
+	Debug( 5, "GOT BODY:",
+	       ( $body ? "\n$body\n" : " ''" ) );
 	$context = "decl";
 	$statement = $tmp;
       } else {
@@ -1201,10 +1187,31 @@ sub Parse ($$) {
       next;
     }
 
-    if ( $statement =~ /^([^;\{\}\:]*)([;\{\}\:])(.*)$/ ) {
+    $delim = "";
+
+    if ( $statement =~ /^([^;\{\}\:]*)(:)([^:].*)$/ ) {
       $lead = $1;
       $delim = $2;
       $rest = $3;
+    } elsif ( $statement =~ /^([^;\{\}\:]*)(:)$/ ) {
+      $lead = $1;
+      $delim = $2;
+      $rest = $3;
+    } elsif ( $statement =~ /^([^;\{\}]*)([;\{\}])(.*)$/ ) {
+      $lead = $1;
+      $delim = $2;
+      $rest = "";
+    }
+
+    Debug( 5, "$NR ",
+	   ($lead ? "'$lead'" : "''" ),
+	   ", ",
+	   ($delim ? "'$delim'" : "''"),
+	   ", ",
+	   ($rest ? '$rest' : "''" ),
+	   "\n$statement" );
+
+    if ( $delim ) {
 
       if ( $delim && $delim eq ":" && $lead =~ /class/ ) {
 	if ( $statement =~ /^(.*class[^:]+:[^\{]+)(\{)(.*)$/ ) {
@@ -1249,6 +1256,292 @@ sub Parse ($$) {
       $statement = $rest;
     } else {
       last;
+    }
+  }
+
+  Debug( 2, "PARSE COMPLETE HASH FOLLOWS" );
+  DebugDumpHash( 2, "PARSE", $topHash, "down" );
+  Debug( 2, "PARSE COMPLETE END  OF HASH" );
+}
+
+sub FindHash ($$) {
+  my ($info, $name) = (@_);
+
+  my $found = undef;
+
+  Debug( 4, "FindHash '$info' '$name'" );
+  DebugDumpHash( 4, "FindHash", $info, "down" );
+  foreach my $num (keys(  %$info )) {
+    Debug( 4, "  checking $num ", $$info{ $num }->{ name } );
+
+    if( $name eq $$info{ $num }->{ name } ) {
+      Debug( 4, "Found" );
+      $found = $$info{ $num };
+      last;
+    }
+  }
+  return( $found );
+}
+
+
+sub ParseComment ($$) {
+  my $comment = shift(@_);
+  my $info  = shift(@_);
+
+  my $prevSection = $commentSection;
+  my $prevSectStartLineNumber = $commentSectionStartLineNum;
+
+  $tabstop = 8;
+  $comment = expand( $comment );
+  Debug( 2, "COMMENT: $comment" );
+  # print $comment;
+  if ( $comment =~ m@^ {1,4}([A-Z]\w[^:]+):\s*(.*)@ ) {
+    Debug( 1, "SECTION: $1 ($NR)\n" );
+    $commentSection = $1;
+    $text = $2;
+    $commentSection =~ s/^\s+//;
+    $commentSection =~ s/\s*$//;
+    $commentSectionStartLineNum = $NR;
+    $$info{ comments }->{ $commentSection } = "$text";
+    # Debug( 5, "Found section: '$section'\n" );
+  } else {
+    if ( $commentSection && length( $commentSection ) ) {
+      $text = $comment;
+      $$info{ comments }->{ $commentSection } .= "$text";
+    }
+  }
+  $comment = "";
+
+  if ( $prevSection && length( $prevSection ) ) {
+    if ( $prevSection ne $commentSection ) {
+      Debug( 1, "NEW SECTION\n" );
+
+      $PARSE_NR = $prevSectStartLineNumber - 1;
+      my $text = $$info{ comments }->{ $prevSection };
+
+      if ( $prevSection =~ /data types/i ) {
+	
+	# Data Types: section
+	
+	my $type;
+	my $name;
+	my $desc;
+	foreach my $line (split(/\n/, $text)) {
+	  ++ $PARSE_NR;
+	  if ( $line
+	       =~ /^\s+(class|struct|typedef|enum)\s+([\w:]+)\s*(.*)$/ ) {
+	    my $tmpType = $1;
+	    my $tmpName = $2;
+	    my $tmpDesc = "$3\n";
+
+	    SetTypeDesc( $info, "public", $type, $name, $desc );
+
+	    $name = $tmpName;
+	    $type = $tmpType;
+	    $desc = $tmpDesc;
+	  } elsif ( $line =~
+		    /^\s*([\w:]+)\s+(class|struct|typedef|enum)\s*(.*)$/ ) {
+	    my $tmpName = $1;
+	    my $tmpType = $2;
+	    my $tmpDesc = "$3\n";
+
+	    SetTypeDesc( $info, "public", $type, $name, $desc );
+
+	    $name = $tmpName;
+	    $type = $tmpType;
+	    $desc = $tmpDesc;
+	  } else {
+	    $desc .= "$line\n";
+	  }
+	}
+	SetTypeDesc( $info, "public", $type, $name, $desc );
+
+	
+      } elsif ( $prevSection =~ /defines/i ) {
+
+	# Defines: section
+
+	my $defDesc;
+	my $defName;
+	foreach my $line (split(/\n/, $text)) {
+	  ++ $PARSE_NR;
+
+	  if ( $line =~ /^ {$tabstop}(\w+)\s*(.*)$/ ) {
+	    my $name = $1;
+	    my $desc = $2;
+	    if( $defName && $defDesc ) {
+	      my $defHash = FindHash( $$info{ defines }, $defName );
+	      if( $defHash ) {
+		$$defHash{ desc } = $defDesc;
+		$defDesc = "";
+	      } else {
+		confess( "PARSE ERROR: define '$defName' UNKNOWN" );
+	      }
+	    }
+	    $defName = $name;
+	    $defDesc = $desc;
+	  } elsif ( $line =~ /^( {9,}\S.*)$/ ) {
+	    $defDesc .= "$1\n";
+	  } elsif ( $line =~ /^\s*$/ ) {
+	    $defDesc .= "$line\n";
+	  } else {
+	    confess( "PARSE ERROR: line:$PARSE_NR\n",
+		     "   line: '$line'" );
+	  }
+	}
+	
+	if( $defName && $defDesc ) {
+	  my $defHash = FindHash( $$info{ defines }, $defName );
+	  if( $defHash ) {
+	    $$defHash{ desc } = $defDesc;
+	    $defDesc = "";
+	  } else {
+	    confess( "PARSE ERROR: define '$defName' UNKNOWN" );
+	  }
+	}
+      } elsif ( $prevSection =~ /macros/i ) {
+
+	# Macros: section
+
+	my $macDesc;
+	my $macArgs;
+	my $macName;
+	foreach my $line (split(/\n/, $text)) {
+	  ++ $PARSE_NR;
+
+	  if ( $line =~ /^ {$tabstop}(\w+)\((.*)\)\s*(.*)$/ ) {
+	    my $name = $1;
+	    my $args = $2;
+	    my $desc = $3;
+	    if( $macName && $macDesc ) {
+	      my $macHash = FindHash( $$info{ macros }, $macName );
+	      if( $macHash ) {
+		$$macHash{ args } = $macArgs;
+		$$macHash{ desc } = $macDesc;
+	      } else {
+		confess( "PARSE ERROR: define '$defName' UNKNOWN" );
+	      }
+	    }
+	    $macName = $name;
+	    $macArgs = $args;
+	    $macDesc = $desc;
+	  } elsif ( $line =~ /^( {9,}\S.*)$/ ) {
+	    $macDesc .= "$1\n";
+	  } elsif ( $line =~ /^\s*$/ ) {
+	    $macDesc .= "$line\n";
+	  } else {
+	    confess( "PARSE ERROR: line:$PARSE_NR\n",
+		     "   line: '$line'" );
+	  }
+	}
+	
+	if( $macName && $macDesc ) {
+	  my $macHash = FindHash( $$info{ macros }, $macName );
+	  if( $macHash ) {
+	    $$macHash{ args } = $macArgs;
+	    $$macHash{ desc } = $macDesc;
+	  } else {
+	    confess( "PARSE ERROR: define '$defName' UNKNOWN" );
+	  }
+	}
+      } elsif ( $prevSection =~ /public interface/i
+		|| $prevSection =~ /constructors/i
+		|| $prevSection =~ /destructors/i
+		|| $prevSection =~ /accociated functions/i
+		|| $prevSection =~ /functions/i ) {
+	my $text = $$info{ comments }->{ $prevSection };
+	my $sectProt = "public";
+	if ( $prevSection =~ /protected interface/i ) {
+	  $sectProt = "protected";
+	} elsif ( $prevSection =~ /accociated functions/i
+		  || $prevSection =~ /functions/i ) {
+	  $sectProt = "global";
+	}
+	Debug( 3, "$prevSection:\n$text\n" );
+	DebugDumpHash(  3, "DESC", $info , "down" );
+
+	# $tabstop = 7;
+	# my @origLines = split( /\n/,$text );
+	# my @detabLines = expand( @origLines );
+	# $text = join( /\n/,@detabLines );
+	# $text = expand( $text );
+	# $text =~ s/ +\n/\n/g;
+	# Debug( 1, "EXPANDED:\n$text\n" );
+
+	#my $funcDecl;
+	#my $funcDesc;
+	#my $context;
+
+	my $itemDesc;
+	my $haveSomeDesc = 0;
+	my $isFuncDecl;
+	my $wasFuncDecl;
+
+	foreach $line (split(/\n/,$text)) {
+	  ++ $PARSE_NR;
+	  Debug( 3, "LINE: '$line'\n" );
+
+	  if ( $line =~ /^( {$tabstop}\S.*)$/ ) {
+
+	    my $tmp = "$1\n";
+
+	    $wasFuncDecl = $isFuncDecl;
+
+	    if ( $tmp =~ /\(/ ) {
+	      Debug( 4, "FOUND OPEN PAREN" );
+	      $isFuncDecl = 1;
+	    }
+
+	    if ( $haveSomeDesc ) {
+
+	      Debug( 4, "DESC: is funct: $wasFuncDecl\n",
+		     "$itemDesc" );
+		
+	      if ( $wasFuncDecl ) {
+		SetFuncDesc( $info, $sectProt, $itemDesc );
+	      } else {
+		SetFieldDesc( $info, $sectProt, $itemDesc );
+	      }
+
+	      $itemDesc = "";
+	      $haveSomeDesc = 0;
+	      $isFuncDecl = 0;
+	    }
+	    $itemDesc .= "$tmp";
+
+	  } elsif ( $line =~ /^( {9,}\S.*)$/ ) {
+
+	    # item desc continuation lines
+	    $itemDesc .= "$line\n";
+	    $haveSomeDesc = 1;
+	  } elsif ( $line =~ /^\s*$/ ) {
+
+	    # blank line
+	    if ( $itemDesc ) {
+	      $itemDesc .= "$line\n";
+	      $haveSomeDesc = 1;
+	    }
+	  } else {
+	    confess( "PARSE ERROR: line:$PARSE_NR\n",
+		     "   line: '$line'" );
+	  }
+	}
+	if ( $itemDesc && $haveSomeDesc ) {
+	
+	  Debug( 4, "DESC: is funct: $wasFuncDecl\n",
+		 "$itemDesc" );
+		
+	  if ( $isFuncDecl ) {
+	    SetFuncDesc( $info, $sectProt, $itemDesc );
+	  } else {
+	    SetFieldDesc( $info, $sectProt, $itemDesc );
+	  }
+	}
+
+      }
+      # next section
+    } else {
+      # Debug( 1, "SAME SECTION: $prevSection\n" );
     }
   }
 }
