@@ -9,6 +9,9 @@
 PERL_SCRIPTS	= \
 	showtables.pl	\
 	tablerows.pl	\
+	makesql.pl		\
+	savedata.pl		\
+	storedata.pl	\
 	tablescripts.pl
 	
 SCRIPTS_PL		=	$(PERL_SCRIPTS:.pl=)
