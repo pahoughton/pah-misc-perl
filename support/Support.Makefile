@@ -31,6 +31,7 @@ include $(PROJECT_DIR)/support/.makeconfigs.configvars
 SUPPORT_ITEMS	=		\
 	$(MAKE_CONFIGS_ITEMS)	\
 	TERM_SIZE		\
+	CONVERT_ASN1		\
 	NET_LDAP		\
 
 SUPPORT_MAKEFILES	=						\
