@@ -145,6 +145,21 @@ sub error ($@) {
   $self->_logit( "ERROR", $fn, $ln, @rest );
 }
 
+sub abort ($$@) {
+  my ($self, $exit_code, @rest) = (@_);
+
+  my ($pkg, $fn, $ln) = caller;
+  if( $fn =~ /(.*) \(autosplit [^\)]+\)/ ) {
+    $fn = $1;
+  }
+  $fn = basename( $fn );
+
+  $self->_logit( "ERROR", $fn, $ln, @rest );
+  $self->_logit( "ERROR Aborted $exit_code" );
+  $$self{ log }->close();
+  exit $exit_code;
+}
+
 sub _logit ($$@) {
   my ($self, $level, $fn, $ln, @rest) = (@_);
 
@@ -159,11 +174,11 @@ sub _logit ($$@) {
 			      $min,
 			      $sec );
     $$self{ log }->print( "$time_stamp $level $fn:$ln " );
-    $$self{ log }->printf( @rest );
+    $$self{ log }->print( @rest,"\n" );
 
     if( $$self{ log_tee } ) {
       print STDERR "$time_stamp $level $fn:$ln ";
-      printf STDERR @rest;
+      print STDERR @rest,"\n";
     }
   }
 			
