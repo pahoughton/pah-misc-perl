@@ -31,6 +31,16 @@ PROJECT_VER_MAJOR	= 1
 PROJECT_VER_MINOR	= 01
 PROJECT_VER_RELEASE	= 01
 
+PROJECT_VER_MGMT	= DIM
+PROJECT_VER_DIM_DB	= COS
+PROJECT_VER_DIM_PRODUCT	= INFR_OBJS
+PROJECT_VER_DIM_RELEASE	= \
+	$(PROJECT_NAME)							\
+	$(PROJECT_VER_MAJOR).$(PROJECT_VER_MINOR).$(PROJECT_VER_RELEASE)
+
+PROJECT_VER_PROD	= $(PROJECT_VER_MAJOR).$(PROJECT_VER_MINOR)
+PROJECT_VER_PREV	= 0.00.00
+
 PROJECT_CONTACT_NAME	= Paul Houghton
 PROJECT_CONTACT_EMAIL	= Paul.Houghton@wcom.com
 
@@ -39,6 +49,13 @@ PROJECT_DESC	=							\
 
 PROJECT_DIR		=	\
 	$(PROJECT_NAME)-$(PROJECT_VER_MAJOR)
+
+PROJECT_EXTRACT_DIR	= src/Build/Tools
+
+RUN_BASE_DIR		=
+
+WWW_TOP_DIR		= ../..
+WWW_TOOLS_ROOT		= $(WWW_TOP_DIR)/Tools
 
 INSTALL_BASE_DIR	= $(TOOL_DIR)
 INSTALL_BIN_DIR		= $(INSTALL_BASE_DIR)/bin
@@ -53,21 +70,33 @@ tools_host		= sideswipe.wcom.com
 tools_host_dir		= pub/tools
 
 CONFIG_VARS	=		\
+	INSTALL_BASE_DIR	\
 	INSTALL_BIN_DIR		\
 	INSTALL_LIB_DIR		\
 	INSTALL_INC_DIR		\
 	INSTALL_JAVA_DIR	\
 	INSTALL_DOC_HTML_DIR	\
-	INSTALL_DOC_MAN_DIR
+	INSTALL_DOC_MAN_DIR	\
+	WWW_TOP_DIR		\
+	WWW_TOOLS_ROOT		\
+				\
+	INSTALL_RUN_BASE_DIR
 
 PROJECT_VARS	=		\
 	PROJECT_NAME		\
 	PROJECT_VER_MAJOR	\
 	PROJECT_VER_MINOR	\
 	PROJECT_VER_RELEASE	\
+	PROJECT_VER_MGMT	\
+	PROJECT_VER_DIM_DB	\
+	PROJECT_VER_DIM_PRODUCT	\
+	PROJECT_VER_DIM_RELEASE	\
+	PROJECT_VER_PROD	\
+	PROJECT_VER_PREV	\
 	PROJECT_CONTACT_NAME	\
 	PROJECT_CONTACT_EMAIL	\
 	PROJECT_DIR		\
+	PROJECT_EXTRACT_DIR	\
 				\
 	make_cfg_ver		\
 	tools_host		\
@@ -80,33 +109,50 @@ PROJECT_VARS	=		\
 
 
 setup_exports	=						\
-	PROJECT_NAME='$(PROJECT_NAME)' \
-	PROJECT_VER_MAJOR='$(PROJECT_VER_MAJOR)' \
-	PROJECT_VER_MINOR='$(PROJECT_VER_MINOR)' \
-	PROJECT_VER_RELEASE='$(PROJECT_VER_RELEASE)' \
-	PROJECT_CONTACT_NAME='$(PROJECT_CONTACT_NAME)' \
-	PROJECT_CONTACT_EMAIL='$(PROJECT_CONTACT_EMAIL)' \
-	PROJECT_DIR='$(PROJECT_DIR)' \
-	make_cfg_ver='$(make_cfg_ver)' \
-	tools_host='$(tools_host)' \
-	tools_host_dir='$(tools_host_dir)' \
-	PROJECT_VARS='$(PROJECT_VARS)' \
-	CONFIG_VARS='$(CONFIG_VARS)' \
-	INSTALL_BIN_DIR='$(INSTALL_BIN_DIR)' \
-	INSTALL_LIB_DIR='$(INSTALL_LIB_DIR)' \
-	INSTALL_INC_DIR='$(INSTALL_INC_DIR)' \
-	INSTALL_JAVA_DIR='$(INSTALL_JAVA_DIR)' \
-	INSTALL_DOC_HTML_DIR='$(INSTALL_DOC_HTML_DIR)' \
-	INSTALL_DOC_MAN_DIR='$(INSTALL_DOC_MAN_DIR)' \
-	hide='$(hide)' \
+	PROJECT_NAME='$(PROJECT_NAME)'				\
+	PROJECT_VER_MAJOR='$(PROJECT_VER_MAJOR)'		\
+	PROJECT_VER_MINOR='$(PROJECT_VER_MINOR)'		\
+	PROJECT_VER_RELEASE='$(PROJECT_VER_RELEASE)'		\
+	PROJECT_VER_MGMT='$(PROJECT_VER_MGMT)'			\
+	PROJECT_VER_DIM_DB='$(PROJECT_VER_DIM_DB)'		\
+	PROJECT_VER_DIM_PRODUCT='$(PROJECT_VER_DIM_PRODUCT)'	\
+	PROJECT_VER_DIM_RELEASE='$(PROJECT_VER_DIM_RELEASE)'	\
+	PROJECT_VER_PROD='$(PROJECT_VER_PROD)'			\
+	PROJECT_VER_PREV='$(PROJECT_VER_PREV)'			\
+	PROJECT_CONTACT_NAME='$(PROJECT_CONTACT_NAME)'		\
+	PROJECT_CONTACT_EMAIL='$(PROJECT_CONTACT_EMAIL)'	\
+	PROJECT_DIR='$(PROJECT_DIR)'				\
+	PROJECT_EXTRACT_DIR='$(PROJECT_EXTRACT_DIR)'		\
+	make_cfg_ver='$(make_cfg_ver)'				\
+	tools_host='$(tools_host)'				\
+	tools_host_dir='$(tools_host_dir)'			\
+	PROJECT_VARS='$(PROJECT_VARS)'				\
+	CONFIG_VARS='$(CONFIG_VARS)'				\
+	INSTALL_BASE_DIR='$(INSTALL_BASE_DIR)'			\
+	INSTALL_BIN_DIR='$(INSTALL_BIN_DIR)'			\
+	INSTALL_LIB_DIR='$(INSTALL_LIB_DIR)'			\
+	INSTALL_INC_DIR='$(INSTALL_INC_DIR)'			\
+	INSTALL_JAVA_DIR='$(INSTALL_JAVA_DIR)'			\
+	INSTALL_DOC_HTML_DIR='$(INSTALL_DOC_HTML_DIR)'		\
+	INSTALL_DOC_MAN_DIR='$(INSTALL_DOC_MAN_DIR)'		\
+	INSTALL_RUN_BASE_DIR='$(INSTALL_RUN_BASE_DIR)'		\
+	WWW_TOP_DIR=$(WWW_TOP_DIR)				\
+	WWW_TOOLS_ROOT=$(WWW_TOOLS_ROOT)			\
+	hide='$(hide)'
 
 config_help	=							\
+	echo "    INSTALL_BASE_DIR=$(INSTALL_BASE_DIR) ";		\
 	echo "    INSTALL_BIN_DIR=$(INSTALL_BIN_DIR) ";			\
 	echo "    INSTALL_LIB_DIR=$(INSTALL_LIB_DIR) ";			\
 	echo "    INSTALL_INC_DIR=$(INSTALL_INC_DIR) ";			\
 	echo "    INSTALL_JAVA_DIR=$(INSTALL_JAVA_DIR) ";		\
 	echo "    INSTALL_DOC_HTML_DIR=$(INSTALL_DOC_HTML_DIR) ";	\
-	echo "    INSTALL_DOC_MAN_DIR=$(INSTALL_DOC_MAN_DIR) ";
+	echo "    INSTALL_DOC_MAN_DIR=$(INSTALL_DOC_MAN_DIR) ";		\
+	echo "    WWW_TOP_DIR=$(WWW_TOP_DIR) ";				\
+	echo "    WWW_TOOLS_ROOT=$(WWW_TOOLS_ROOT) ";			\
+	echo "    tools_host=$(tools_host) ";				\
+	echo "    tools_host_dir=$(tools_host_dir) ";
+	echo "    INSTALL_RUN_BASE_DIR=$(INSTALL_RUN_BASE_DIR) ";
 
 #
 # Targets
@@ -144,15 +190,20 @@ setup:
 	  echo								      \
 	  exit 1;							      \
 	else								      \
+	  echo "+ Starting Setup of $(PROJECT_NAME)" `date`;		      \
 	  $(MAKE) -f $(PROJECT_DIR)/support/MakeConfigs.Makefile setup	      \
-		$(setup_exports) || exit 1;				      \
+		$(setup_exports)   					      \
+		EXTRACT_DIR=`pwd`					      \
+		|| exit 1;						      \
 	  $(TOOL_DIR)/bin/make -f $(PROJECT_DIR)/support/Setup.Makefile setup \
-		$(setup_exports) || exit 1;				      \
+		$(setup_exports)   					      \
+		EXTRACT_DIR=`pwd`					      \
+		|| exit 1;						      \
 	  echo $(PROJECT_DESC) |					      \
 	    perl -ne 'use Text::Wrap; print fill("","", $$_ ),"\n";'	      \
 	    > $(PROJECT_DIR)/src/config/.prjdesc.txt ;			      \
 	  echo ;							      \
-	  echo "+ Setup $(PROJECT_NAME) Complete.";			      \
+	  echo "+ Setup $(PROJECT_NAME) Complete -" `date`;		      \
 	  echo ;							      \
 	fi
 
