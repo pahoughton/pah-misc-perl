@@ -1,0 +1,9 @@
+Revision history for Perl extension Log.
+
+See ChangeLog in lib/ for detailed history
+
+0.01  Sat Oct 23 16:24:07 2004
+	- original version; created by h2xs 1.23 with options
+		-Xn Log
+
+

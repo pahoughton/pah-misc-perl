@@ -1,0 +1,6 @@
+ChangeLog
+Makefile.PL
+MANIFEST
+README
+t/Log.t
+lib/Log.pm
