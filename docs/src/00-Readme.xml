@@ -37,13 +37,11 @@
     </projectname>
     <docversion
         created="02/13/01 08:56"
-        verprj="%PP%"
-        veritem="%PI% (%PF%)"
-	verlastmodby="%PO%"
-        verlastmod="%PRT%"
-        verversion="%PIV%"
-	verstatus="%PS%"
-        verversionid="%PID%"/>
+	verlastmodby="$Author$"
+        verlastmod="$Date$"
+        verversion="$Revision$"
+	verstatus="$State$"
+        verversionid="$Id$"/>
     <contact>&PRJ.XML.CONTACT;</contact>
   </dochead>
 
