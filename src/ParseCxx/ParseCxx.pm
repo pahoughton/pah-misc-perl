@@ -823,13 +823,21 @@ sub SetFuncDesc ($$$) {
 	     $desc );
   }
 
-  if( $rest =~ /^\s*const\s*=\s*0\s*;*(.*)/s ) {
+  if( $rest =~ /^\s*const\s*=\s*0\s*;(.*)/s ) {
+    $funcConst = "const";
+    $funcPurVirtual = "= 0";
+    $funcDesc = $1;
+  } elsif( $rest =~ /^\s*const\s*=\s*0(.*)/s ) {
+    $funcConst = "const";
+    $funcPurVirtual = "= 0";
+    $funcDesc = $1;
+  } elsif ( $rest =~ /^\s*const\s*;(.*)/s ) {
     $funcConst = "const";
     $funcDesc = $1;
-  } elsif ( $rest =~ /^\s*const\s*;*(.*)/s ) {
+  } elsif ( $rest =~ /^\s*const(.*)/s ) {
     $funcConst = "const";
     $funcDesc = $1;
-  } elsif( $rest =~ /^\s*;*(.*)/s ) {
+  } elsif( $rest =~ /^\s*;(.*)/s ) {
     $funcDesc = $1;
   } else {
     $funcDesc = $rest;
@@ -855,6 +863,11 @@ sub SetFuncDesc ($$$) {
 
   if( length( $sig ) == 0 ) {
     $sig = "void";
+  }
+
+  if(  $return =~ /friend(.*)/ ) {
+    $prot = "global";
+    $return = $1;
   }
 
   if( $return =~ /template/ ) {
@@ -951,7 +964,7 @@ sub SetFuncDesc ($$$) {
 				$sig,
 				"$funcConst $funcPurVirtual",
 				$info );
-      $funcInfo{ desc } = $funcDesc;
+      $$funcInfo{ desc } = $funcDesc;
     } else {
       DebugDumpHash(  0, "FUNCS", $funcList , "down" );
       confess( "ERROR: $$info{ filename }:$PARSE_NR function",
