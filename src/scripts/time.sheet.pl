@@ -1,39 +1,23 @@
 #!/usr/local/bin/perl
-# -*- perl -*-
-# 
-# Title:            time.sheet
-# 
-# Description:
+#
+# Title:        time.sheet.pl
+# Project:	Time Sheet
+# Desc:
 # 
 #   Generate a timesheet from log
 # 
 # Notes:
 # 
-# Programmer:	    Paul Houghton - (paul_houghton@wiltel.com)
-# 
-# Start Date:	    6/23/94
-# 
-# Modification History:
+# Author:	Paul Houghton - (paul.houghton@wcom.com)
+# Created:	6/23/94
 #
-# $Id$
+# Revision History: (See end of file for Revision Log)
 #
-# $Log$
-# Revision 1.5  1997/05/12 11:15:08  houghton
-# Rework taskOrder so I don't have to specify an order number.
+#   Last Mod By:    $Author$
+#   Last Mod:	    $Date$
+#   Version:	    $Revision$
 #
-# Revision 1.4  1997/05/12 10:58:14  houghton
-# Added Dist development.
-#
-# Revision 1.3  1997/02/24 15:27:01  houghton
-# Added aniserver.
-# Changed to open ~/pers/work/status/log.
-#
-# Revision 1.2  1996/10/02 12:07:32  houghton
-# *** empty log message ***
-#
-# Revision 1.1  1995/11/16  18:05:08  houghton
-# Initial Version.
-#
+#   $Id$
 # 
 
 $DEBUG = 0;
@@ -496,5 +480,28 @@ printf("\n-- MONTH HOURS: (%d)  %.2f\n\n",
 
 
 
+#
+# $Log$
+# Revision 1.6  1997/05/12 11:17:53  houghton
+# Cleanup header and comments.
+#
+# Revision 1.5  1997/05/12 11:15:08  houghton
+# Rework taskOrder so I don't have to specify an order number.
+#
+# Revision 1.4  1997/05/12 10:58:14  houghton
+# Added Dist development.
+#
+# Revision 1.3  1997/02/24 15:27:01  houghton
+# Added aniserver.
+# Changed to open ~/pers/work/status/log.
+#
+# Revision 1.2  1996/10/02 12:07:32  houghton
+# *** empty log message ***
+#
+# Revision 1.1  1995/11/16  18:05:08  houghton
+# Initial Version.
+#
 
-
+# Local Variables:
+# mode:perl
+# End:
