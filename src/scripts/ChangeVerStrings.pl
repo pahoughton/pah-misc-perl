@@ -116,7 +116,7 @@ sub main {
     rename( $fn, "$fn.bak" )
       || die( "rename $fn to $fn.bak - $!" );
 
-    print "Changing $fn";
+    print "Changing $fn\n";
 
     my $in = new IO::File( "< $fn.bak" );
 
