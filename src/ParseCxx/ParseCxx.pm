@@ -334,6 +334,12 @@ sub ParseStatement ($$$) {
   my $pre;
   my $nested = undef;
 
+  if( $statement =~ /\(\s*\*\s*\w+\s*\)\s*\([^\)]+\)/ ) {
+    # pointer to a function variable
+    # FIXME JUST BLOW IT OFF
+    return( $info );
+  }
+
   if( $statement =~ /([^\(]*operator[^\(]+\(\s*\))(\s+\(.*)$/s ) {
     $pre = $1;
     $rest = $2;
@@ -808,10 +814,10 @@ sub SetFuncDesc ($$$) {
     } elsif( $pre =~ /(.*)\s+(operator.*)$/s ) {
       $return = $1;
       $funcName = $2;
-    } elsif ( $pre =~ /(.*)\s+([\w:]+)\s*$/s ) {
+    } elsif ( $pre =~ /(.*)\s+(~?[\w:]+)\s*$/s ) {
       $return = $1;
       $funcName = $2;
-    } elsif ( $pre =~ /\s*([\w:]+)\s*$/s ) {
+    } elsif ( $pre =~ /\s*(~?[\w:]+)\s*$/s ) {
       $return = "";
       $funcName = $1;
     } else {
@@ -1170,6 +1176,7 @@ sub Parse ($$) {
 
     chop;
     $statement .= " $_";
+    Debug( 5, "STATEMENT: $statement" );
 
     if( $context eq $CNTX_CONSTRUCTOR_ARG_INIT ) {
       if( $statement =~ /([^\{]+)\{(.*)$/s ) {
@@ -1209,11 +1216,11 @@ sub Parse ($$) {
     } elsif ( $statement =~ /^([^;\{\}\:]*)(:)$/ ) {
       $lead = $1;
       $delim = $2;
-      $rest = $3;
+      $rest = "";
     } elsif ( $statement =~ /^([^;\{\}]*)([;\{\}])(.*)$/ ) {
       $lead = $1;
       $delim = $2;
-      $rest = "";
+      $rest = $3;
     }
 
     Debug( 5, "$NR ",
