@@ -52,7 +52,8 @@ all default check install_all install install_lib_all::
 	for dir in $$subdirs ; do		\
 	  echo "+ Makeing $@ in $$dir ...";	\
 	  ( cd $$dir				\
-	    && $(TOOL_DIR)/bin/perl Makefile.PL	\
+	    && type perl \
+	    && perl Makefile.PL	\
 	    && make				\
 	    && make test			\
 	    && make install ) || exit 1;	\
