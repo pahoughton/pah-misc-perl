@@ -109,8 +109,14 @@ sub main {
 
 
   foreach my $fn (@{$opts->opt( 'files' )}) {
+    if( -d $fn ) {
+      next;
+    }
+
     rename( $fn, "$fn.bak" )
       || die( "rename $fn to $fn.bak - $!" );
+
+    print "Changing $fn";
 
     my $in = new IO::File( "< $fn.bak" );
 
@@ -122,6 +128,13 @@ sub main {
     if( ! defined( $out ) ) {
       die "open $fn - $!";
     }
+
+    my $authorTag = '$Author$ ';
+    my $dateTag = '$Date$ ';
+    my $idTag = '$Id$ ';
+    my $tagTag = '$Name$ ';
+    my $revTag = '$Revision$ ';
+    my $statusTag = '$State$ ';
 
     my $hasPerlDoc = 0;
     while( <$in> ) {
@@ -143,11 +156,11 @@ sub main {
       } elsif( $hasPerlDoc ) {
 	s/\%PP\%//;
 	s/\(?\%PF\%\)?//;
-	s/\"\%PO\%\"/\'\$Author$ \'/;
-	s/\"\%PRT\%\"/\'\$Date$ \'/;
-	s/^(.*)\"\%PIV\%\"/$1\'\$Revision$ \';\n\$Doc\{ VerTag \}\t    = \'\$Name$ \'/;
-	s/\"\%PS\%\"/\'\$State$ \'/;
-	s/\"\%PID\%\"/\'\$Id$ \'/;
+	s/\"\%PO\%\"/\'\$autorTag\'/;
+	s/\"\%PRT\%\"/\'\$dateTag\'/;
+	s/^(.*)\"\%PIV\%\"/$1\'$revTag \';\n\$Doc\{ VerTag \}\t    = \'$tagTag \'/;
+	s/\"\%PS\%\"/\'$statusTag \'/;
+	s/\"\%PID\%\"/\'\$idTag \'/;
 	$out->print( $_ );
       } elsif( /\$Doc/ ) {
 	$hasPerlDoc = 1;
@@ -156,11 +169,11 @@ sub main {
 	s/\%PP\%//;
 	s/\%PI\%//;
 	s/\(?\%PF\%\)?//;
-	s/\%PO\%/\$Author$ /;
-	s/\%PRT\%/\$Date$ /;
-	s/^(.*)\%PIV\%/$1\$Name$\n$1\$Revision$ /;
-	s/\%PS\%/\$State$ /;
-	s/\%PID\%/\$Id$/;
+	s/\%PO\%/$authorTag /;
+	s/\%PRT\%/$dateTag /;
+	s/^(.*)\%PIV\%/$1$tagTag\n$1$revTag /;
+	s/\%PS\%/$statusTag /;
+	s/\%PID\%/$idTag/;
 	$out->print( $_ );
       }
     }
