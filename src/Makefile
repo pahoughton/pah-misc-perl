@@ -30,11 +30,12 @@ config_dir	= $(PRJ_TOPDIR)/src/config
 include $(config_dir)/00-Makefile.cfg
 include Make/make.cfg.$(make_cfg_ver)
 
-SUBDIRS		=	\
+SUBDIRS		=		\
 	App/Debug		\
 	Text/Fill		\
 	Doc/Self		\
-	App/Options
+	App/Options		\
+	ParseCxx
 
 TARGETS		= $(standard_targets) debug
 
