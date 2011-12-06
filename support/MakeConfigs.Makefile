@@ -38,7 +38,7 @@ setup_output	= >> $(EXTRACT_DIR)/$(PROJECT_DIR)/.setup.output 2>&1
 
 GZIP_SUPPORT_TYPE	= TOOL
 GZIP_NAME		= gzip
-GZIP_VER		= 1.2.4
+GZIP_VER		= 1.3.12
 GZIP_DOC_HTML		= http://www.gnu.org/software/gzip
 GZIP_DOC		= gzip(info)  gzip(1)
 GZIP_DESC_CMD		=	\
@@ -154,7 +154,7 @@ $(GZIP_target): $(GZIP_tar)
 	&& $(MAKE) install $(setup_output)			\
 	&& echo " Done -" `date`
 
-$(MAKE_CONFIGS_target): $(MAKE_CONFIGS_tar)
+$(MAKE_CONFIGS_target):
 	$(hide) echo "+ Installing $(MAKE_CONFIGS_NAME) ...\c"		\
 	&& cd $(MAKE_CONFIGS_EXTRACT_DIR)				\
 	&& $(tools_bin_dir)/zcat $(MAKE_CONFIGS_tar) | tar xf -		\
