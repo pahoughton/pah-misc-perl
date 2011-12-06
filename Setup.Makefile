@@ -10,7 +10,7 @@
 #
 # Notes:
 #
-# Author:	Paul Houghton <Paul.Houghton@wcom.com>
+# Author:	Paul Houghton <paul4hough@gmail.com>
 # Created:	5/30/101 using GenProject 6.01.01
 #
 # Revision History: (See end of file for Revision Log)
@@ -42,7 +42,7 @@ PROJECT_VER_PROD	= $(PROJECT_VER_MAJOR).$(PROJECT_VER_MINOR)
 PROJECT_VER_PREV	= 1.02.01
 
 PROJECT_CONTACT_NAME	= Paul Houghton
-PROJECT_CONTACT_EMAIL	= Paul.Houghton@mci.com
+PROJECT_CONTACT_EMAIL	= paul4hough@gmail.com
 
 PROJECT_DESC	=							\
 	$(PROJECT_NAME) is a collection of generic perl modules and scripts.
@@ -67,8 +67,8 @@ INSTALL_JAVA_DIR	= $(INSTALL_BASE_DIR)/share/java
 INSTALL_DOC_HTML_DIR	= $(INSTALL_BASE_DIR)/html
 INSTALL_DOC_MAN_DIR	= $(INSTALL_BASE_DIR)/man
 
-make_cfg_ver		= 7.01
-tools_host		= soundwave.mcilink.com
+make_cfg_ver		= 11.12
+tools_host		= 
 tools_host_dir		= pub/tools
 
 CONFIG_VARS	=		\

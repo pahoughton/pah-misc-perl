@@ -20,7 +20,7 @@ $Doc{ Notes } = "
    For the rest of this programs documentation, either run it
    with -man or see `Detailed Documentation' below.
 ";
-$Doc{ Author } =  [["Paul Houghton","<paul.houghton\@wcom.com>"]];
+$Doc{ Author } =  [["Paul Houghton","<paul4hough\@gmail.com>"]];
 $Doc{ Created } = "07/18/01 07:20";
 
 $Doc{ Last_Mod_By } = "%PO%";

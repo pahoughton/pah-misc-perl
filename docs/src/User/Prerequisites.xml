@@ -32,7 +32,7 @@
     </keywords>
     <authorgrp>
       <author fullname="Paul Houghton"
-	      email="Paul.Houghton@wcom.com"/>
+	      email="paul4hough@gmail.com"/>
     </authorgrp>
     <projectname>
       &PRJ.NAME;
@@ -149,12 +149,12 @@
 	</p>
 	<p>
 	  A tar file containg the sources for gzip is available for
-	  anonymous ftp from:
+	  anonyous ftp from:
 	</p>
 	<p>
 	  <indent>
 	    <ulink>
-	      ftp://soundwave.mcilink.com/pub/tools/gzip-1.2.4.tar
+	      mftp://ftp.gnu.org/gnu/gzip/gzip-1.3.12.tar
 	    </ulink>
 	  </indent>
 	</p>

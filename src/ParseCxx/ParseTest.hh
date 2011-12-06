@@ -12,7 +12,7 @@
   
    Quick Start: - short example of class usage
   
-   Author:      Paul Houghton - (paul.houghton@wcom.com)
+   Author:      Paul Houghton - (paul4hough@gmail.com)
    Created:     02/26/01 04:57
   
    Revision History: (See end of file for Revision Log)

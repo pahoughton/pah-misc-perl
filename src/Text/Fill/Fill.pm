@@ -11,7 +11,7 @@
 #   See pod below for documentation
 #
 # Created:  02/25/01 00:19
-# Author:   Paul Houghton <paul.houghton@wcom.com>
+# Author:   Paul Houghton <paul4hough@gmail.com>
 #
 # Revision Information (See Revision Log below for more info)
 #
@@ -173,7 +173,7 @@ This is what you would get output:
 
 %PRT%
 
-Paul Houghton <paul.houghton@wcom.com>
+Paul Houghton <paul4hough@gmail.com>
 
 =head1 SEE ALSO
 

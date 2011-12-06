@@ -13,7 +13,7 @@
 # 
 # Notes:
 # 
-# Author:	Paul Houghton - (paul.houghton@wcom.com)
+# Author:	Paul Houghton - (paul4hough@gmail.com)
 # Created:	10/28/99 15:29
 #
 # Revision History: (See end of file for Revision Log)
@@ -98,6 +98,9 @@ exit $exit_code
 #
 # 
 # $Log$
+# Revision 1.2  2011/12/06 13:46:31  paul
+# Cleanup.
+#
 # Revision 1.1  2001/06/21 09:37:07  houghton
 # Initial Version.
 #

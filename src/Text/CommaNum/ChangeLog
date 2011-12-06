@@ -1,11 +1,11 @@
-2002-08-27  Paul Houghton 719-527-7834  <paul.houghton@wcom.com>
+2002-08-27  Paul Houghton  <paul4hough@gmail.com>
 
 	* test.pl: fixed test to actually verify functionallity.
 
 	* CommaNum.pm (CommanNum): Chnanged to use logic from perlfaq5
 	* CommaNum.pm (Text): improved documentation
 
-2002-07-23  Paul Houghton 719-527-7834  <paul.houghton@wcom.com>
+2002-07-23  Paul Houghton  <paul4hough@gmail.com>
 
 	* CommaNum.pm: original version; created by h2xs 1.21 with options
 	-Xn Text::CommaNum

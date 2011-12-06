@@ -22,7 +22,7 @@ $Doc{ Description } = "
 $Doc{ Notes } = "
 
 ";
-$Doc{ Author } =  [["Paul Houghton","<paul.houghton\@wcom.com>"]];
+$Doc{ Author } =  [["Paul Houghton","<paul4hough\@gmail.com>"]];
 $Doc{ Created } = "05/30/01 06:34";
 
 $Doc{ Last_Mod_By } = "HOUGHTON";

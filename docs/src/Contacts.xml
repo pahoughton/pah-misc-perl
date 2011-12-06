@@ -21,7 +21,7 @@
        
     </keywords>
     <authorgrp>
-      <author fullname="Paul Houghton" email="paul.houghton@wcom.com"/>
+      <author fullname="Paul Houghton" email="paul4hough@gmail.com"/>
     </authorgrp>
     <projectname>
       &PRJ.NAME;
@@ -33,12 +33,10 @@
   <contact-list>      
     <who>
       <role>Manager</role>
-      <email>doyle.munday@wcom.com</email>
-    <name>Kenneth D Munday</name><phone>972-753-4366</phone><vnet>926-4366</vnet></who>
     <who>
       <role>Project Lead / Developer</role>
-      <email>paul.houghton@wcom.com</email>
-    <name>Paul A Houghton</name><phone>719-535-3209</phone><vnet>622-3209</vnet></who>
+      <email>paul4hough@gmail.com</email>
+    <name>Paul A Houghton</name></who>
   </contact-list>
 
 </contacts>

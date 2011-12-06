@@ -7,5 +7,5 @@ WriteMakefile(
     'PREREQ_PM'		=> {}, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM => 'CommaNum.pm', # retrieve abstract from module
-       AUTHOR     => 'Paul Houghton <paul.houghton@wcom.com>') : ()),
+       AUTHOR     => 'Paul Houghton <paul4hough@gmail.com>') : ()),
 );

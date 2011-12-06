@@ -11,7 +11,7 @@
 #   See pod below for documentation
 #
 # Created:  5/30/01 13:28
-# Author:   Paul Houghton <paul.houghton@wcom.com>
+# Author:   Paul Houghton <paul4hough@gmail.com>
 #
 # Revision Information
 #
@@ -96,7 +96,7 @@ None by default.
 
 =head1 AUTHOR
 
-Paul Houghton <paul.houghton@wcom.com>
+Paul Houghton <paul4hough@gmail.com>
 
 =head1 SEE ALSO
 

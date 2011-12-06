@@ -30,7 +30,7 @@
     </keywords>
     <authorgrp>
       <author fullname="Paul Houghton"
-	      email="paul.houghton@wcom.com"/>
+	      email="paul4hough@gmail.com"/>
     </authorgrp>
     <projectname>
       &PRJ.NAME;
@@ -48,11 +48,10 @@
   <contact-list>      
     <who>
       <role>Manager</role>
-      <email>doyle.munday@wcom.com</email>
     </who>
     <who>
       <role>Project Lead / Developer</role>
-      <email>paul.houghton@wcom.com</email>
+      <email>paul4hough@gmail.com</email>
     </who>
   </contact-list>
 

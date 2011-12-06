@@ -9,5 +9,5 @@ WriteMakefile(
 			   IO::Handle => 1.24 }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Log.pm', # retrieve abstract from module
-       AUTHOR         => 'Paul Houghton 719-527-7834 <houghton@mcilink.com>') : ()),
+       AUTHOR         => 'Paul Houghton <paul4hough@gmail.com>') : ()),
 );

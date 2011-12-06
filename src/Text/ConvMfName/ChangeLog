@@ -1,4 +1,4 @@
-2003-04-07  Paul Houghton 719-527-7834  <paul.houghton@wcom.com>
+2003-04-07  Paul Houghton  <paul4hough@gmail.com>
 
 	* ConvMfName.pm: original version; created by h2xs 1.21 with
 	options -Xn Text::ConvMfName

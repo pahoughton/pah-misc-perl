@@ -33,7 +33,7 @@
     </keywords>
     <authorgrp>
       <author fullname="Paul Houghton"
-	      email="Paul.Houghton@wcom.com"/>
+	      email="paul4hough@gmail.com"/>
     </authorgrp>
     <projectname>
       %PRJ.NAME;
@@ -52,13 +52,9 @@
     <date>8/27/02</date>
     <desc>
       <p>
-	Added Teamnet and Text::CommaNum modules.
+	Added Text::CommaNum modules.
       </p>
       <dl>
-	<dt><doc usedesc="no" doc="Devel/Teamnet">Teamnet</doc></dt>
-	<dd>
-	  Perl module to access WorldCom Teamnet LDAP server.
-	</dd>
 	<dt><doc usedesc="no"
 		 doc="Devel/CommaNum">Text::CommaNum</doc></dt>
 	<dd>
@@ -70,9 +66,6 @@
   <release>
     <version status="devel">1.01.01</version>
     <date>06/15/01</date>
-    <ver-mgmt>
-      Dimmensions - COS/INFR_OBJS Rel: &PRJ.NAME; &PRJ.VER;
-    </ver-mgmt>
     <desc>
       <p>
 	Initial Release - includes the following:
@@ -102,15 +95,6 @@
     </desc>
   </release>
 </rel-notes>
-
-<!-- Revision Log:
-
-  $Log$
-  Revision 1.4  2002/08/27 14:45:02  houghton
-  Changed Version tags to CVS.
-
-
--->
 
 <!-- Xemacs Local Variables -->
 

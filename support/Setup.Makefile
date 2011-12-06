@@ -12,7 +12,7 @@
 #
 # Notes:
 #
-# Author:	Paul Houghton - <paul.houghton@wcom.com>
+# Author:	Paul Houghton - <paul4hough@gmail.com>
 # Created:	03/05/01 05:03
 #
 # Revision History: (See end of file for Revision Log)

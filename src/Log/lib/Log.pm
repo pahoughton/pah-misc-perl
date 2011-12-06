@@ -225,11 +225,11 @@ If you have a web site set up for your module, mention it here.
 
 =head1 AUTHOR
 
-Paul Houghton 719-527-7834, E<lt>houghton@mcilink.comE<gt>
+Paul Houghton, E<lt>paul4hough@gmail.com<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004 by Paul Houghton 719-527-7834
+Copyright (C) 2004 by Paul Houghton
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.5 or,
