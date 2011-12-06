@@ -1,4 +1,4 @@
-#!/usr/bin/ksh
+#!/bin/ksh
 #
 # File:         mkdirhier.sh
 # Project:	PerlUtils %PP%

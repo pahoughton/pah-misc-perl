@@ -38,7 +38,6 @@ SUBDIRS		=		\
 	Doc/Self		\
 	App/Options		\
 	ParseCxx		\
-	Teamnet			\
 
 
 TARGETS		= $(standard_targets) debug
