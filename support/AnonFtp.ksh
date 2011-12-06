@@ -62,7 +62,7 @@ fi
 
 cat << EOF > $cmdfile
 open $host
-user anonymous $ftp_user@wcom.com
+user anonymous $ftp_user@aol.com
 binary
 cd $remote_dir
 get $remote_fn
@@ -98,6 +98,9 @@ exit $exit_code
 #
 # 
 # $Log$
+# Revision 1.3  2011/12/06 13:56:37  paul
+# Cleanup.
+#
 # Revision 1.2  2011/12/06 13:46:31  paul
 # Cleanup.
 #

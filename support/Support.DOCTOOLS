@@ -35,9 +35,9 @@ DOCTOOLS_API_DOC_URI	= $(WWW_TOOLS_ROOT)/DocTools/Devel/JavaApi
 DOCTOOLS_DESC_CMD	= \
 	cat $(DOCTOOLS_EXTRACT_DIR)/$(DOCTOOLS_BUILD_DIR)/src/config/.prjdesc.txt
 DOCTOOLS_CLASSPATH	= \
-	$(INSTALL_JAVA_DIR)/$(DOCTOOLS_NAME)/com.wcom.cisid.DocTools.Xml.Element-$(DOCTOOLS_VER).jar \
-	$(INSTALL_JAVA_DIR)/$(DOCTOOLS_NAME)/com.wcom.cisid.DocTools.Xml-$(DOCTOOLS_VER).jar \
-	$(INSTALL_JAVA_DIR)/$(DOCTOOLS_NAME)/com.wcom.cisid.DocTools.Xslt-$(DOCTOOLS_VER).jar \
+	$(INSTALL_JAVA_DIR)/$(DOCTOOLS_NAME)/pahough.DocTools.Xml.Element-$(DOCTOOLS_VER).jar \
+	$(INSTALL_JAVA_DIR)/$(DOCTOOLS_NAME)/pahough.DocTools.Xml-$(DOCTOOLS_VER).jar \
+	$(INSTALL_JAVA_DIR)/$(DOCTOOLS_NAME)/pahough.DocTools.Xslt-$(DOCTOOLS_VER).jar \
 
 DOCTOOLS_INC_DIRS	= 
 DOCTOOLS_LIB_DIRS	= 

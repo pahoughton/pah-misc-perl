@@ -27,16 +27,11 @@ SHELL	= /bin/ksh
 hide	= @
 
 PROJECT_NAME		= PerlUtils
-PROJECT_VER_MAJOR	= 2
-PROJECT_VER_MINOR	= 01
+PROJECT_VER_MAJOR	= 11
+PROJECT_VER_MINOR	= 12
 PROJECT_VER_RELEASE	= 01
 
-PROJECT_VER_MGMT	= DIM
-PROJECT_VER_DIM_DB	= COS
-PROJECT_VER_DIM_PRODUCT	= INFR_OBJS
-PROJECT_VER_DIM_RELEASE	= \
-	$(PROJECT_NAME)							\
-	$(PROJECT_VER_MAJOR).$(PROJECT_VER_MINOR).$(PROJECT_VER_RELEASE)
+PROJECT_VER_MGMT	= CVS
 
 PROJECT_VER_PROD	= $(PROJECT_VER_MAJOR).$(PROJECT_VER_MINOR)
 PROJECT_VER_PREV	= 1.02.01
@@ -159,7 +154,7 @@ config_help	=							\
 	echo "    WWW_OBJECT_REP_ROOT=$(WWW_OBJECT_REP_ROOT) ";		\
 	echo "    WWW_PROJECTS_ROOT=$(WWW_PROJECTS_ROOT) ";		\
 	echo "    tools_host=$(tools_host) ";				\
-	echo "    tools_host_dir=$(tools_host_dir) ";
+	echo "    tools_host_dir=$(tools_host_dir) ";			\
 	echo "    INSTALL_RUN_BASE_DIR=$(INSTALL_RUN_BASE_DIR) ";
 
 #

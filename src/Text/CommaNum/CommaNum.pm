@@ -63,7 +63,7 @@ CommaNum
 
 =head1 AUTHOR
 
-Paul Houghton <paul.hougthon@wcom.com>
+Paul Houghton <paul4hough@gmail.com>
 
 =head1 SEE ALSO
 
