@@ -5,8 +5,8 @@ use warnings;
 
 our %Doc;
 $Doc{ File }	=   "Options.pm";
-$Doc{ Project } =   ["PerlUtils","%PP%"];
-$Doc{ Item }   	=   "%PI% (%PF%)";
+$Doc{ Project } =   ["PerlUtils",""];
+$Doc{ Item }   	=   "\$Id$)";
 $Doc{ desc } = "Perl module to process command line arguments.";
 
 $Doc{ Description } = "

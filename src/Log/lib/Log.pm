@@ -166,7 +166,7 @@ sub _logit ($$@) {
   if( $$self{ log_level } =~ /$level/ ) {
     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)
       = localtime(time);
-    my $time_stamp = sprintf( "%04d-%02d-%02d %02d:%02d:%02d",
+    my $time_stamp = sprintf( "%04d%02d%02d %02d%02d%02d",
 			      1900 + $year,
 			      $mon + 1,
 			      $mday,
@@ -196,7 +196,8 @@ Log - Perl extension for blah blah blah
 =head1 SYNOPSIS
 
   use Log;
-  blah blah blah
+
+  my $Log = Log( log-file => "log.txt" );
 
 =head1 DESCRIPTION
 
