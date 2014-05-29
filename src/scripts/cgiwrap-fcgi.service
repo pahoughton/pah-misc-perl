@@ -1,0 +1,13 @@
+# systemd.service(5) file for cgiwrap-fcgi.pl
+
+[Unit]
+Description=Fast cgi serivce to wrap Simple CGI requests
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=simple
+
+User=nginx
+Group=nginx
+
+ExecStart=/usr/local/bin/cgiwrap-fcgi.pl -s '/var/run/nginx/cgiwrap-dispatch.sock' -p 5
