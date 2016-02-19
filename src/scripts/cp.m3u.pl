@@ -48,10 +48,12 @@ while(<>) {
     if( /.*(album.*)/ ) {
 	my $destfn = $1;
 	my $destdir = "$dest/".dirname($destfn);
-	make_path($destdir);
-	if( ! -f "$dest/$destfn" ) {
-	    print "$destfn\n";
-	    copy( $_, "$dest/$destfn" ) || print("ERROR $_ - $!");
+	my $srcfn = "/home/paul/Music/$destfn";
+	my $destpath = "$dest/$destfn";
+	if( ! -f $destpath ) {
+	    print "cp $srcfn\n   $destpath\n";
+	    make_path($destdir);
+	    copy( $srcfn, $destpath ) || print("ERROR $srcfn - $!");
 	}
     }
 }
