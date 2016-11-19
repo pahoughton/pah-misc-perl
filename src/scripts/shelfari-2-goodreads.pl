@@ -9,8 +9,8 @@ use warnings;
 use strict;
 use Text::CSV;
 
-my $csv = new Text::CSV({ binary => 1});
-
+my $csv = new Text::CSV();
+# { encoding  => "utf8" }
 open( my $fh, "<", $ARGV[0] ) || die($ARGV[0]);
 my $flds = $csv->getline($fh);
 
